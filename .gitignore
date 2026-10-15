@@ -21,3 +21,5 @@ desktop.ini
 *.log
 appsettings.Local.json
 *.backup-*.mdb
+# Surové odpovědi Pohody z --save-response (osobní údaje; do fixtures jen anonymizované)
+tmp/
