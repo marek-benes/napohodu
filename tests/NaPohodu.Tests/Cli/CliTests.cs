@@ -22,8 +22,6 @@ public sealed class CliTests : IDisposable
     [Fact]
     public async Task Customers_PrintsTable()
     {
-        _runner.Fixture = "Synthetic/listAccountingUnit.response.xml";
-
         var exitCode = await Run("customers");
 
         Assert.Equal(PohodaCommandRunner.Ok, exitCode);
@@ -32,14 +30,12 @@ public sealed class CliTests : IDisposable
         Assert.Contains("Žluťoučký kůň s.r.o.", text, StringComparison.Ordinal);
         Assert.Contains("daňová evidence", text, StringComparison.Ordinal);
         Assert.Contains("Celkem 2 jednotek.", text, StringComparison.Ordinal);
-        Assert.Null(_runner.Database);
+        Assert.Null(Assert.Single(_runner.Calls).Database);
     }
 
     [Fact]
     public async Task Customers_FiltersByYearAndSearch()
     {
-        _runner.Fixture = "Synthetic/listAccountingUnit.response.xml";
-
         var exitCode = await Run("customers", "--year", "2025", "--search", "dvořák");
 
         Assert.Equal(PohodaCommandRunner.Ok, exitCode);
@@ -52,12 +48,9 @@ public sealed class CliTests : IDisposable
     [Fact]
     public async Task Invoices_PrintsTableAndDocumentsSummary()
     {
-        _runner.Fixture = "Synthetic/listInvoice.received.response.xml";
-
         var exitCode = await Run("invoices", "--customer", "StwPh_12345678_2026", "--from", "2026-01-01", "--to", "2026-03-31");
 
         Assert.Equal(PohodaCommandRunner.Ok, exitCode);
-        Assert.Equal("StwPh_12345678_2026", _runner.Database);
         var text = _output.ToString();
         Assert.Contains("26110009", text, StringComparison.Ordinal);
         Assert.Contains(@"Fakturace\Přijaté faktury\2611\26110009", text, StringComparison.Ordinal);
@@ -68,13 +61,43 @@ public sealed class CliTests : IDisposable
     }
 
     [Fact]
+    public async Task Invoices_WithoutIco_ResolvesUnitFirst()
+    {
+        var exitCode = await Run("invoices", "-c", "StwPh_12345678_2026");
+
+        Assert.Equal(PohodaCommandRunner.Ok, exitCode);
+        Assert.Collection(
+            _runner.Calls,
+            acu => Assert.Equal((null, null), (acu.Database, acu.Ico)),
+            inv => Assert.Equal(("StwPh_12345678_2026", "12345678"), (inv.Database, inv.Ico)));
+    }
+
+    [Fact]
+    public async Task Invoices_WithIco_SkipsUnitLookup()
+    {
+        var exitCode = await Run("invoices", "-c", "StwPh_12345678_2026", "--ico", "12345678");
+
+        Assert.Equal(PohodaCommandRunner.Ok, exitCode);
+        var call = Assert.Single(_runner.Calls);
+        Assert.Equal(("StwPh_12345678_2026", "12345678"), (call.Database, call.Ico));
+    }
+
+    [Fact]
+    public async Task Invoices_UnknownCustomer_ReturnsError()
+    {
+        var exitCode = await Run("invoices", "-c", "neexistuje");
+
+        Assert.Equal(PohodaCommandRunner.PohodaError, exitCode);
+        Assert.Contains("„neexistuje“", _error.ToString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task Invoices_SaveResponse_WritesRawBytes()
     {
-        _runner.Fixture = "Synthetic/listInvoice.received.response.xml";
         var path = Path.Combine(Path.GetTempPath(), $"napohodu-{Guid.NewGuid():N}.xml");
         try
         {
-            var exitCode = await Run("invoices", "-c", "X", "--save-response", path);
+            var exitCode = await Run("invoices", "-c", "X", "--ico", "12345678", "--save-response", path);
 
             Assert.Equal(PohodaCommandRunner.Ok, exitCode);
             Assert.Equal(FixtureFiles.ReadBytes("Synthetic/listInvoice.received.response.xml"), await File.ReadAllBytesAsync(path, TestContext.Current.CancellationToken));
@@ -160,26 +183,27 @@ public sealed class CliTests : IDisposable
             .InvokeAsync(new InvocationConfiguration { Output = _output, Error = _error }, TestContext.Current.CancellationToken);
     }
 
+    /// <summary>Vrací fixture podle typu požadavku, zaznamenává volání, umí simulovat chybu.</summary>
     private sealed class FakeRunner : IPohodaXmlRunner
     {
-        public string Fixture { get; set; } = "Synthetic/listAccountingUnit.response.xml";
-
         public PohodaException? Error { get; set; }
 
-        public bool WasCalled { get; private set; }
+        public List<(string? Database, string? Ico)> Calls { get; } = [];
 
-        public string? Database { get; private set; }
+        public bool WasCalled => Calls.Count > 0;
 
         public Task<PohodaXmlResponse> RunAsync(XDocument request, string? database, CancellationToken cancellationToken = default)
         {
-            WasCalled = true;
-            Database = database;
+            Calls.Add((database, request.Root!.Attribute("ico")?.Value));
             if (Error is not null)
             {
                 throw Error;
             }
 
-            var bytes = FixtureFiles.ReadBytes(Fixture);
+            var isUnitList = request.Descendants(PohodaNamespaces.Acu + "listAccountingUnitRequest").Any();
+            var bytes = FixtureFiles.ReadBytes(isUnitList
+                ? "Synthetic/listAccountingUnit.response.xml"
+                : "Synthetic/listInvoice.received.response.xml");
             return Task.FromResult(new PohodaXmlResponse(PohodaXmlRunner.ParseResponse(bytes), bytes));
         }
     }

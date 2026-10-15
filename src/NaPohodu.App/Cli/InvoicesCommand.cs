@@ -20,7 +20,10 @@ internal static class InvoicesCommand
         };
         var fromOption = CliOptions.Date("--from", "Datum od");
         var toOption = CliOptions.Date("--to", "Datum do");
-        var icoOption = new Option<string?>("--ico") { Description = "IČ jednotky; Pohoda jím ověří, že jde o správnou firmu." };
+        var icoOption = new Option<string?>("--ico")
+        {
+            Description = "IČ jednotky. Bez něj se IČ dohledá ze seznamu jednotek (o jedno spuštění Pohody déle).",
+        };
         var saveResponseOption = CliOptions.SaveResponse();
 
         var command = new Command("invoices", "Vypíše přijaté faktury účetní jednotky včetně záložky Dokumenty.")
@@ -48,11 +51,23 @@ internal static class InvoicesCommand
                 parseResult.GetValue(saveResponseOption),
                 async (client, output, ct) =>
                 {
-                    var invoices = await client.GetReceivedInvoicesAsync(
-                        parseResult.GetValue(customerOption)!,
-                        filter,
-                        parseResult.GetValue(icoOption),
-                        ct).ConfigureAwait(false);
+                    var dataFile = parseResult.GetValue(customerOption)!;
+                    var ico = parseResult.GetValue(icoOption);
+
+                    // Pohoda odmítne balíček bez ico/key jednotky; bez --ico ho zjistíme ze seznamu jednotek.
+                    IReadOnlyList<Invoice> invoices;
+                    if (string.IsNullOrWhiteSpace(ico))
+                    {
+                        await parseResult.InvocationConfiguration.Error.WriteLineAsync("Zjišťuji IČ jednotky ze seznamu jednotek…").ConfigureAwait(false);
+                        var unit = await client.FindAccountingUnitAsync(dataFile, ct).ConfigureAwait(false);
+                        invoices = await client.GetReceivedInvoicesAsync(unit, filter, ct).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        invoices = await client.GetReceivedInvoicesAsync(dataFile, new UnitIdentity(ico, key: null), filter, ct)
+                            .ConfigureAwait(false);
+                    }
+
                     await output.WriteAsync(Format(invoices)).ConfigureAwait(false);
                 },
                 cancellationToken).ConfigureAwait(false);

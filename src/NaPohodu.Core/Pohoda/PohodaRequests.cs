@@ -15,7 +15,7 @@ public static class PohodaRequests
         DataPack.Create(
             id: "acu",
             note: "Seznam účetních jednotek",
-            ico: null,
+            unit: null,
             new XElement(Acu + "listAccountingUnitRequest", new XAttribute("version", "1.6")));
 
     /// <summary>
@@ -23,8 +23,9 @@ public static class PohodaRequests
     /// (<c>restrictionData/attachments=true</c> → <c>companyDocumentsFolder</c>, <c>subFolder</c>).
     /// <c>limit</c> neposíláme, takže export se nedělí na části (<c>rdc:parts</c>).
     /// </summary>
-    public static XDocument ListReceivedInvoices(InvoiceFilter? filter = null, string? ico = null)
+    public static XDocument ListReceivedInvoices(UnitIdentity unit, InvoiceFilter? filter = null)
     {
+        ArgumentNullException.ThrowIfNull(unit);
         filter ??= new InvoiceFilter();
 
         var request = new XElement(
@@ -42,7 +43,7 @@ public static class PohodaRequests
                 Lst + "restrictionData",
                 new XElement(Lst + "attachments", "true")));
 
-        return DataPack.Create(id: "inv", note: "Export přijatých faktur", ico, request);
+        return DataPack.Create(id: "inv", note: "Export přijatých faktur", unit, request);
     }
 
     private static string FormatDate(DateOnly date) => date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);

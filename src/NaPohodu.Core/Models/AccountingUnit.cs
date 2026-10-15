@@ -44,4 +44,18 @@ public sealed record AccountingUnit
 
     /// <summary>Název pro zobrazení: firma, jinak jméno osoby, jinak datový soubor.</summary>
     public string DisplayName => Company ?? PersonName ?? DataFile;
+
+    /// <summary>Identita pro <c>dat:dataPack</c> (IČ nebo key); <c>null</c>, pokud Pohoda nevrátila ani jedno.</summary>
+    public Pohoda.UnitIdentity? Identity =>
+        string.IsNullOrWhiteSpace(Ico) && string.IsNullOrWhiteSpace(Key) ? null : new Pohoda.UnitIdentity(Ico, Key);
+
+    /// <summary>
+    /// Shoda s názvem datového souboru zadaným uživatelem: bez ohledu na velikost písmen
+    /// a s příponou <c>.mdb</c> i bez ní (Pohoda vrací <c>08215839_2026.mdb</c>).
+    /// </summary>
+    public bool MatchesDataFile(string dataFile) =>
+        string.Equals(WithoutMdbExtension(DataFile), WithoutMdbExtension(dataFile.Trim()), StringComparison.OrdinalIgnoreCase);
+
+    private static string WithoutMdbExtension(string dataFile) =>
+        dataFile.EndsWith(".mdb", StringComparison.OrdinalIgnoreCase) ? dataFile[..^4] : dataFile;
 }

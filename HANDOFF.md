@@ -73,9 +73,10 @@ Mapování modulů `napohodu-electron/src` → nová generace:
 
 1. ~~Založit řešení (`dotnet new sln`, Core/App/Tests), `Directory.Build.props` s `RuntimeIdentifier=win-x86`, `.editorconfig`, nullable + warnings as errors.~~ Hotovo 2026-10-15: .NET 10, `NaPohodu.slnx`, xunit v3 na Microsoft.Testing.Platform, `PohodaOptions` + vrstvená konfigurace, `napohodu --help/--version`.
 2. ~~`Core/Pohoda`: runner (`Pohoda.exe /XML` s timeoutem, INI, dekódování windows-1250), DataPack obálka, kontrola `state`, parser `listAccountingUnit` a `listInvoice` (přijaté, s `attachments=true`).~~ Hotovo 2026-10-15: `PohodaXmlRunner`, `DataPack`, `PohodaRequests` (validované proti XSD v testech), `ResponsePack`, `AccountingUnitParser`, `InvoiceParser`, `PohodaClient`. Testy zatím nad **syntetickými** fixtures (`tests/…/Fixtures/Synthetic`); proti reálné Pohodě neověřeno. Ověřit v kroku 3:
-   - zda Pohoda čte INI ve windows-1250 (temp cesta obsahuje diakritiku uživatelského jména),
-   - zda `Pohoda.exe` vrací chybové kódy 1xx/5xx jako návratový kód procesu, nebo jen v odpovědi,
-   - zda export faktur projde bez `ico` v dataPack (jen `database` v INI),
+   - ~~zda Pohoda čte INI ve windows-1250~~ **Ověřeno 2026-10-15:** ano, funguje i s diakritikou v temp cestě (`C:\Users\Marek Beneš\…`).
+   - zda `Pohoda.exe` vrací chybové kódy 1xx/5xx jako návratový kód procesu, nebo jen v odpovědi. **Částečně:** odmítnutý balíček vrátí kód 0 a `responsePack state="error"` s `note`.
+   - ~~zda export faktur projde bez `ico`~~ **Ověřeno 2026-10-15: neprojde** („Tento balíček není určen pro tuto jednotku.“, odpověď nese `ico` a `key` otevřené jednotky). Požadavky nad jednotkou proto vyžadují `UnitIdentity` (IČ, jinak `key`); CLI bez `--ico` dohledá jednotku přes `listAccountingUnit`.
+   - `acu:dataFile` vrací název **včetně přípony** (`08215839_2026.mdb`) a ten se předává jako `database` v INI. `acu:id` Pohoda neposílá. Seznam 83 jednotek trval 4,7 s, odpověď 93 kB.
    - skutečný tvar `number/ids`, `companyDocumentsFolder` a `subFolder` (viz otevřené otázky).
 3. ~~`App`: CLI `napohodu customers` a `napohodu invoices --customer <dataFile> [--from --to]` s tabulkovým výstupem.~~ Hotovo 2026-10-15 (+ `napohodu config`, `--save-response`). **Zbývá ověřit proti reálné Pohodě** a získat reálné odpovědi jako fixtures (anonymizovat před commitem, nahradit `Fixtures/Synthetic`); body k ověření viz krok 2.
 4. Teprve pak `Core/Filing`, `Core/Mdb` a Blazor `serve`.

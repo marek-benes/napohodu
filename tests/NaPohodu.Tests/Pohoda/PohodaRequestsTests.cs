@@ -11,6 +11,7 @@ namespace NaPohodu.Tests.Pohoda;
 public class PohodaRequestsTests
 {
     private static readonly Lazy<XmlSchemaSet> _schemas = new(LoadSchemas);
+    private static readonly UnitIdentity _ico = new("12345678", key: null);
 
     [Fact]
     public void ListAccountingUnits_HasEnvelopeWithoutIco()
@@ -28,7 +29,7 @@ public class PohodaRequestsTests
     [Fact]
     public void ListReceivedInvoices_RequestsAttachmentsAndReceivedType()
     {
-        var request = PohodaRequests.ListReceivedInvoices();
+        var request = PohodaRequests.ListReceivedInvoices(_ico);
 
         var list = Content(request);
         Assert.Equal(Lst + "listInvoiceRequest", list.Name);
@@ -42,26 +43,42 @@ public class PohodaRequestsTests
     public void ListReceivedInvoices_WritesDateFilterAndIco()
     {
         var request = PohodaRequests.ListReceivedInvoices(
-            new InvoiceFilter(new DateOnly(2026, 1, 1), new DateOnly(2026, 3, 31)),
-            ico: "12345678");
+            _ico,
+            new InvoiceFilter(new DateOnly(2026, 1, 1), new DateOnly(2026, 3, 31)));
 
         var filter = Content(request).Element(Lst + "requestInvoice")!.Element(Ftr + "filter")!;
         Assert.Equal("2026-01-01", filter.Element(Ftr + "dateFrom")?.Value);
         Assert.Equal("2026-03-31", filter.Element(Ftr + "dateTill")?.Value);
         Assert.Equal("12345678", request.Root!.Attribute("ico")?.Value);
+        Assert.Null(request.Root!.Attribute("key"));
+    }
+
+    [Fact]
+    public void ListReceivedInvoices_UnitWithoutIco_UsesKey()
+    {
+        var request = PohodaRequests.ListReceivedInvoices(new UnitIdentity(ico: null, key: "0dae2f2b"));
+
+        Assert.Null(request.Root!.Attribute("ico"));
+        Assert.Equal("0dae2f2b", request.Root!.Attribute("key")?.Value);
+    }
+
+    [Fact]
+    public void UnitIdentity_WithoutIcoAndKey_Throws()
+    {
+        Assert.Throws<ArgumentException>(() => new UnitIdentity(" ", null));
     }
 
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public void Requests_AreValidAgainstOfficialSchemas(bool withFilter)
+    public void Requests_AreValidAgainstOfficialSchemas(bool withFilterAndKey)
     {
         XDocument[] requests =
         [
             PohodaRequests.ListAccountingUnits(),
             PohodaRequests.ListReceivedInvoices(
-                withFilter ? new InvoiceFilter(new DateOnly(2026, 1, 1), new DateOnly(2026, 12, 31)) : null,
-                withFilter ? "12345678" : null),
+                new UnitIdentity("12345678", withFilterAndKey ? "0dae2f2b-ee10-43ac-babe-18971ec01786" : null),
+                withFilterAndKey ? new InvoiceFilter(new DateOnly(2026, 1, 1), new DateOnly(2026, 12, 31)) : null),
         ];
 
         foreach (var request in requests)
