@@ -163,6 +163,85 @@ public sealed class CliTests : IDisposable
     }
 
     [Fact]
+    public async Task DocDirs_PreviewThenApply()
+    {
+        using var temp = new Filing.TempDirectory();
+        var mdb = Mdb.TestMdb.Create(Path.Combine(temp.Path, "data", RealFixtures.UnitDataFile2025));
+        Mdb.TestMdb.AddInvoice(mdb, 4451, "251100002");
+        var company = temp.Dir("Firma");
+        temp.File("x", "Firma", "Fakturace", "Přijaté faktury", "2511", "251100002", "k251100002.pdf");
+        string[] args = ["docdirs", "-c", RealFixtures.UnitDataFile2025, "--company-folder", company];
+
+        var preview = await Run(SettingsWithData(temp), args);
+
+        Assert.Equal(PohodaCommandRunner.Ok, preview);
+        Assert.Contains("DocDirs: vložit 1", _output.ToString(), StringComparison.Ordinal);
+        Assert.Empty(Mdb.TestMdb.DocDirs(mdb));
+
+        var apply = await Run(SettingsWithData(temp), [.. args, "--apply"]);
+
+        Assert.Equal(PohodaCommandRunner.Ok, apply);
+        Assert.Equal(@"Fakturace\Přijaté faktury\2511\251100002", Assert.Single(Mdb.TestMdb.DocDirs(mdb)).Dir);
+        Assert.Single(Directory.EnumerateFiles(Path.Combine(temp.Path, "zalohy")));
+    }
+
+    [Fact]
+    public async Task Filing_ApplyWithMarkDocs_MovesAndMarks()
+    {
+        using var temp = new Filing.TempDirectory();
+        var mdb = Mdb.TestMdb.Create(Path.Combine(temp.Path, "data", RealFixtures.UnitDataFile2025));
+        Mdb.TestMdb.AddInvoice(mdb, 4532, "251100038");
+        var source = temp.Dir("zdroj");
+        var company = temp.Dir("Firma");
+        temp.File("nová", "zdroj", "251100038.pdf");
+
+        var exitCode = await Run(
+            SettingsWithData(temp),
+            "filing", "-c", RealFixtures.UnitDataFile2025, "--source", source, "--company-folder", company, "--apply", "--mark-docs");
+
+        Assert.Equal(PohodaCommandRunner.Ok, exitCode);
+        Assert.True(File.Exists(Path.Combine(company, "Fakturace", "Přijaté faktury", "2511", "251100038", "251100038.pdf")));
+        Assert.Equal((4532, @"Fakturace\Přijaté faktury\2511\251100038"), Assert.Single(Mdb.TestMdb.DocDirs(mdb)) is var row ? (row.RelId, row.Dir) : default);
+        Assert.Contains("DocDirs zapsáno: vloženo 1", _output.ToString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task Filing_MarkDocsWhileUnitIsOpen_MovesButDoesNotWrite()
+    {
+        using var temp = new Filing.TempDirectory();
+        var mdb = Mdb.TestMdb.Create(Path.Combine(temp.Path, "data", RealFixtures.UnitDataFile2025));
+        Mdb.TestMdb.AddInvoice(mdb, 4532, "251100038");
+        var source = temp.Dir("zdroj");
+        var company = temp.Dir("Firma");
+        temp.File("nová", "zdroj", "251100038.pdf");
+
+        // Pohoda drží MDB otevřenou: skutečný zámek Jet nesmaže, dokud je soubor otevřený.
+        using var pohoda = new System.Data.OleDb.OleDbConnection($"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={mdb}");
+        pohoda.Open();
+
+        var exitCode = await Run(
+            SettingsWithData(temp),
+            "filing", "-c", RealFixtures.UnitDataFile2025, "--source", source, "--company-folder", company, "--apply", "--mark-docs");
+
+        Assert.Equal(PohodaCommandRunner.PohodaError, exitCode);
+        Assert.True(File.Exists(Path.Combine(company, "Fakturace", "Přijaté faktury", "2511", "251100038", "251100038.pdf")));
+        Assert.Contains("napohodu docdirs -c 90000010_2025.mdb --apply", _output.ToString(), StringComparison.Ordinal);
+        pohoda.Close();
+        Assert.Empty(Mdb.TestMdb.DocDirs(mdb));
+    }
+
+    [Fact]
+    public async Task Filing_MarkDocsWithoutApply_IsRejected()
+    {
+        using var temp = new Filing.TempDirectory();
+
+        var exitCode = await Run("filing", "-c", RealFixtures.UnitDataFile2025, "--source", temp.Path, "--mark-docs");
+
+        Assert.Equal(PohodaCommandRunner.InvalidArguments, exitCode);
+        Assert.False(_runner.WasCalled);
+    }
+
+    [Fact]
     public async Task Filing_MissingSource_IsRejectedWithoutRunningPohoda()
     {
         var exitCode = await Run("filing", "-c", RealFixtures.UnitDataFile2025, "--source", @"C:\neexistuje\nikde");
@@ -222,16 +301,24 @@ public sealed class CliTests : IDisposable
         Assert.DoesNotContain("tajne-heslo", _output.ToString(), StringComparison.Ordinal);
     }
 
-    private Task<int> Run(params string[] args) =>
-        Run(
-            new Dictionary<string, string?>
-            {
-                // Validace vyžaduje existující soubor; skutečně se nespouští (falešný runner).
-                ["Pohoda:ExePath"] = typeof(CliTests).Assembly.Location,
-                ["Pohoda:Username"] = "uzivatel",
-                ["Pohoda:Password"] = "tajne-heslo",
-            },
-            args);
+    private Task<int> Run(params string[] args) => Run(Settings(), args);
+
+    private static Dictionary<string, string?> Settings() =>
+        new()
+        {
+            // Validace vyžaduje existující soubor; skutečně se nespouští (falešný runner).
+            ["Pohoda:ExePath"] = typeof(CliTests).Assembly.Location,
+            ["Pohoda:Username"] = "uzivatel",
+            ["Pohoda:Password"] = "tajne-heslo",
+        };
+
+    private static Dictionary<string, string?> SettingsWithData(Filing.TempDirectory temp)
+    {
+        var settings = Settings();
+        settings["Pohoda:DataPath"] = Path.Combine(temp.Path, "data");
+        settings["Pohoda:BackupPath"] = Path.Combine(temp.Path, "zalohy");
+        return settings;
+    }
 
     private Task<int> Run(Dictionary<string, string?> settings, params string[] args)
     {

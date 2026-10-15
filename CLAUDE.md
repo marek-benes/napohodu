@@ -88,7 +88,8 @@ Ověřená fakta:
 - Vazba doklad → adresář: tabulka **`DocDirs`** (`ID`, `RelAgID`, `RelSubID` = NULL, `RelID` = `FA.ID`, `Dir` = cesta relativně od složky firmy, backslashe, bez koncového `\`, může být NULL/prázdné).
 - `RelAgID`: vydané faktury **2**, přijaté faktury **3**. Obě sdílejí tabulku `FA`; `RelTpFak` vydané **1**, přijaté **11** (dobropisy a zálohové faktury mají jiné hodnoty, zatím neřešeno).
 - Pozorované tvary `Dir`: přijaté `Fakturace\Přijaté faktury\2611\26110009` (s úrovní prefixu), vydané `Fakturace\Vydané faktury\10090262` (ploché). Proč se liší, není ověřeno.
-- **Zápis vždy**: jednotka zavřená v Pohodě (žádný `.ldb` vedle `.mdb`, pozor i na jiné stanice v síti) → záloha MDB (mimo datovou složku Pohody, s úklidem starých záloh) → exkluzivní otevření → jedna transakce → INSERT s `ID = MAX(ID)+1`, UPDATE jen řádků s prázdným `Dir`; **nikdy nepřepisovat** existující odlišný `Dir`, jen reportovat.
+- **Zápis vždy**: jednotka zavřená v Pohodě (žádný `.ldb` vedle `.mdb`, pozor i na jiné stanice v síti) → záloha MDB (mimo datovou složku Pohody, s úklidem starých záloh) → exkluzivní otevření → jedna transakce → INSERT bez ID (`DocDirs.ID` je AutoNumber, ověřeno), UPDATE jen řádků s prázdným `Dir`; **nikdy nepřepisovat** existující odlišný `Dir`, jen reportovat. Implementace: `src/NaPohodu.Core/Mdb` (`DocDirsSnapshot`, `DocDirsPlanner`, `DocDirsWriter`).
+- OleDb potřebuje vestavěné COM: **nepublikovat s AOT ani trimmingem** (vypnuto v `Directory.Build.props`).
 - Historické ročníky: řádky v `DocDirs` neškodí, v UI Pohody jsou neaktivní.
 
 ---
@@ -128,9 +129,9 @@ dotnet publish src/NaPohodu.App -c Release -o publish
 ```
 
 - `global.json` drží SDK 10.0.x a zapíná pro `dotnet test` Microsoft.Testing.Platform (xunit v3 jinak na .NET 10 SDK neběží).
-- `Directory.Build.props`: `net10.0`, `win-x86`, nullable, warnings as errors, analyzéry `latest-recommended`. Verze balíčků centrálně v `Directory.Packages.props`.
+- `Directory.Build.props`: `net10.0-windows`, `win-x86`, nullable, warnings as errors, analyzéry `latest-recommended`. Verze balíčků centrálně v `Directory.Packages.props`.
 - `nuget.config` v repozitáři nastavuje nuget.org (nespoléhat na globální konfiguraci stroje).
-- CLI (`src/NaPohodu.App/Cli`): `napohodu customers [--year] [--search]`, `napohodu invoices -c <dataFile> [--from --to RRRR-MM-DD] [--ico]`, `napohodu config`, `napohodu filing -c <dataFile> --source <adresář> [--company-folder] [--apply] [--on-conflict Skip|KeepBoth]` (výchozí náhled; přesun až s `--apply`, nikdy nepřepisuje). Společné `--verbose` (logy na stderr) a `--save-response <soubor>` (surová odpověď Pohody → podklad pro fixtures, před commitem anonymizovat). Tabulky jdou na stdout, hlášky a logy na stderr. Návratové kódy: 0 OK, 1 chyba Pohody / chybné volby, 2 konfigurace, 64 nesmyslné volby, 130 přerušeno.
+- CLI (`src/NaPohodu.App/Cli`): `napohodu customers [--year] [--search]`, `napohodu invoices -c <dataFile> [--from --to RRRR-MM-DD] [--ico]`, `napohodu config`, `napohodu filing -c <dataFile> --source <adresář> [--company-folder] [--apply] [--on-conflict Skip|KeepBoth]` (výchozí náhled; přesun až s `--apply`, nikdy nepřepisuje; `--mark-docs` po přesunu poznačí DocDirs), `napohodu docdirs -c <dataFile> [--company-folder] [--apply]` (rekonciliace DocDirs se složkami na disku, výchozí náhled). Společné `--verbose` (logy na stderr) a `--save-response <soubor>` (surová odpověď Pohody → podklad pro fixtures, před commitem anonymizovat). Tabulky jdou na stdout, hlášky a logy na stderr. Návratové kódy: 0 OK, 1 chyba Pohody / chybné volby, 2 konfigurace, 64 nesmyslné volby, 130 přerušeno.
 - Fixtures pro testy = anonymizované reálné odpovědi Pohody (`tests/NaPohodu.Tests/Fixtures/Real`). Nové vytvářet jen přes `tools/anonymize-fixture.cs` (postup v `Fixtures/README.md`); surové odpovědi z `--save-response` patří do `tmp/` (mimo git) a nikdy do commitu.
 - Pro `dotnet run` patří lokální konfigurace do `src/NaPohodu.App/appsettings.Local.json` (Web SDK ji zkopíruje vedle exe; je v `.gitignore`).
 - Konfigurace aplikace: `appsettings.json` (v gitu, bez tajných údajů) → `appsettings.Local.json` vedle exe (mimo git, vzor `appsettings.Local.example.json`) → proměnné prostředí `NAPOHODU_*` (např. `NAPOHODU_Pohoda__Password`). Sekce `Pohoda` = `PohodaOptions`.

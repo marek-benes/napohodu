@@ -23,4 +23,18 @@ public sealed class PohodaOptions
 
     /// <summary>Nejdelší povolená doba jednoho běhu <c>Pohoda.exe /XML</c>; potom se proces ukončí.</summary>
     public TimeSpan Timeout { get; set; } = TimeSpan.FromMinutes(2);
+
+    /// <summary>
+    /// Složka pro zálohy MDB před zápisem. Nikdy datová složka Pohody (1. generace tam zálohy hromadila).
+    /// Prázdné = <c>%LOCALAPPDATA%\NaPohodu\Zalohy</c>.
+    /// </summary>
+    public string BackupPath { get; set; } = string.Empty;
+
+    /// <summary>Kolik posledních záloh jednoho datového souboru ponechat; starší se mažou.</summary>
+    public int BackupsToKeep { get; set; } = 10;
+
+    public string EffectiveBackupPath =>
+        string.IsNullOrWhiteSpace(BackupPath)
+            ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "NaPohodu", "Zalohy")
+            : BackupPath;
 }

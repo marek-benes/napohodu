@@ -40,6 +40,7 @@ internal static class ConfigCommand
             $"Uživatel:            {Show(options.Username)}",
             $"Heslo:               {(string.IsNullOrEmpty(options.Password) ? "(nenastaveno)" : "(nastaveno)")}",
             $"Timeout:             {options.Timeout}",
+            $"Zálohy MDB:          {options.EffectiveBackupPath} (ponechat {options.BackupsToKeep})",
             string.Empty);
     }
 

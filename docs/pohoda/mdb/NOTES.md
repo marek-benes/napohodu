@@ -39,8 +39,12 @@ skutečné umístění složky na disku.
       `DocDirs (RelAgID, RelID) → FA.ID`
 - [x] `RelTpFak`: vydané faktury = `1`, přijaté faktury = `11`
       (ověřeno dotazem 2026-07 na FA.ID 1825 / 4995)
-- [ ] zda je `DocDirs.ID` AutoNumber (explicitní vklad MAX+1 Jet povoluje tak
-      jako tak, v exkluzivním režimu bez souběhu je bezpečný)
+- [x] `DocDirs.ID` i `FA.ID` jsou **AutoNumber** (schéma reálné `_2025.mdb`, 2026-10-15).
+      2. generace proto vkládá bez ID; AutoNumber přidělil MAX+1 (ověřeno na kopii).
+- [x] `inv:id` z XML exportu = `FA.ID` (např. 4451 ↔ `Cislo` 251100002); `FA.Cislo` je TEXT(32).
+- [x] Ve `DocDirs` jsou i jiné agendy (RelAgID 17, 19, 25, 28 – neidentifikováno); pracujeme jen s `RelAgID = 3`.
+- [x] Na disku se může stejné číslo vyskytnout ploše i pod prefixem (`…\251100001` i `…\2511\251100001`);
+      rekonciliace takové číslo přeskočí a nahlásí, Pohoda měla poznačenou plochou variantu.
 
 ## Praktické poznámky
 
@@ -63,6 +67,18 @@ skutečné umístění složky na disku.
 - otevřený datový soubor poznáš podle lock souboru `.ldb` vedle `.mdb`
 - zápis vždy: zavřená jednotka v Pohodě → záloha → exkluzivní režim → transakce
 - po zápisu ověřit v Pohodě záložku Dokumenty na dotčené faktuře
+
+## 2. generace (C#, `src/NaPohodu.Core/Mdb`)
+
+- `System.Data.OleDb` v x86 procesu; potřebuje vestavěné COM, takže **žádné AOT ani trimming**
+  (jinak „requires MDAC“ – ověřeno).
+- Čtení sdíleně (`Mode=Read`, smí běžet i při otevřené Pohodě); zápis jen bez `.ldb` → záloha do
+  `Pohoda:BackupPath` (výchozí `%LOCALAPPDATA%\NaPohodu\Zalohy`, nikdy datová složka, úklid na `BackupsToKeep`)
+  → `Mode=Share Exclusive` → jedna transakce s opětovnou kontrolou stavu (INSERT jen bez řádku,
+  UPDATE jen prázdného `Dir`; jiný `Dir` = konflikt, nepřepisuje se).
+- Pozor: Jet po zavření sdíleného spojení smaže „svůj“ `.ldb`; zámek otevřené Pohody zůstává.
+- CLI: `napohodu docdirs -c <dataFile> [--apply]` (rekonciliace disk ↔ DB jako `mdb-mark-docs.ps1`),
+  `napohodu filing … --apply --mark-docs` (poznačí jen právě zatříděné).
 
 ## Skripty
 

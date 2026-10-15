@@ -2,6 +2,7 @@ using System.CommandLine;
 using System.Globalization;
 using System.Text;
 using NaPohodu.Core.Filing;
+using NaPohodu.Core.Mdb;
 
 namespace NaPohodu.App.Cli;
 
@@ -37,6 +38,11 @@ internal static class FilingCommand
             DefaultValueFactory = _ => ConflictMode.Skip,
         };
 
+        var markDocsOption = new Option<bool>("--mark-docs")
+        {
+            Description = "Po přesunu poznačit podsložky v databázi Pohody (DocDirs). Jen s --apply; jednotka musí být v Pohodě zavřená.",
+        };
+
         var command = new Command("filing", "Zatřídí soubory přijatých faktur do Dokumentů jednotky (výchozí je náhled).")
         {
             customerOption,
@@ -44,6 +50,7 @@ internal static class FilingCommand
             companyFolderOption,
             applyOption,
             conflictOption,
+            markDocsOption,
         };
 
         command.SetAction(async (parseResult, cancellationToken) =>
@@ -63,7 +70,21 @@ internal static class FilingCommand
                 return PohodaCommandRunner.InvalidArguments;
             }
 
-            var documentsPath = AppConfiguration.GetPohodaOptions(services.Configuration).DocumentsPath;
+            var options = AppConfiguration.GetPohodaOptions(services.Configuration);
+            var apply = parseResult.GetValue(applyOption);
+            var markDocs = parseResult.GetValue(markDocsOption);
+            if (markDocs && !apply)
+            {
+                await error.WriteLineAsync("--mark-docs má smysl jen spolu s --apply (náhled poznačení ukáže napohodu docdirs).").ConfigureAwait(false);
+                return PohodaCommandRunner.InvalidArguments;
+            }
+
+            if (markDocs && DocDirsCli.CheckDataPath(options) is { } dataPathError)
+            {
+                await error.WriteLineAsync(dataPathError).ConfigureAwait(false);
+                return PohodaCommandRunner.ConfigurationError;
+            }
+
             var failed = false;
 
             var exitCode = await PohodaCommandRunner.RunAsync(
@@ -78,20 +99,25 @@ internal static class FilingCommand
 
                     var companyFolder = companyFolderOverride is not null
                         ? new CompanyFolderResolution(companyFolderOverride.FullName.TrimEnd('\\'), "zadáno volbou --company-folder", [])
-                        : CompanyFolderResolver.Resolve(unit, invoices, documentsPath);
+                        : CompanyFolderResolver.Resolve(unit, invoices, options.DocumentsPath);
 
                     var plan = FilingPlanner.Plan(source.FullName, invoices, companyFolder);
                     await output.WriteAsync(FormatPlan(plan, unit.DisplayName, invoices.Count)).ConfigureAwait(false);
 
-                    if (!parseResult.GetValue(applyOption))
+                    if (!apply)
                     {
                         await output.WriteLineAsync("Náhled – nic se nepřesunulo. Pro provedení přidejte --apply.").ConfigureAwait(false);
                         return;
                     }
 
                     var results = FilingExecutor.Execute(plan, parseResult.GetValue(conflictOption));
-                    await output.WriteAsync(FormatResults(results)).ConfigureAwait(false);
+                    await output.WriteAsync(FormatResults(results, docDirsHandled: markDocs)).ConfigureAwait(false);
                     failed = results.Any(r => r.Outcome == FilingOutcome.Failed);
+
+                    if (markDocs)
+                    {
+                        failed |= !await MarkDocsAsync(output, results, unit.DataFile, options).ConfigureAwait(false);
+                    }
                 },
                 cancellationToken).ConfigureAwait(false);
 
@@ -144,7 +170,27 @@ internal static class FilingCommand
         return output.ToString();
     }
 
-    internal static string FormatResults(IReadOnlyList<FilingResultItem> results)
+    /// <summary>Poznačí DocDirs pro zatříděné soubory. Při otevřené jednotce nic nepíše a poradí, jak dokončit.</summary>
+    private static async Task<bool> MarkDocsAsync(TextWriter output, IReadOnlyList<FilingResultItem> results, string dataFile, Core.Configuration.PohodaOptions options)
+    {
+        var mdbPath = PohodaDataFile.PathFor(options.DataPath, dataFile);
+        var plan = DocDirsPlanner.Plan(mdbPath, DocDirsSnapshot.Read(mdbPath), DocDirsTargets.FromFiling(results));
+        await output.WriteLineAsync().ConfigureAwait(false);
+        await output.WriteAsync(DocDirsCli.FormatPlan(plan)).ConfigureAwait(false);
+
+        if (plan.Writes.Any() && PohodaDataFile.FindLock(mdbPath) is not null)
+        {
+            await output.WriteLineAsync(
+                $"Jednotka je otevřená v Pohodě – soubory jsou přesunuté, ale DocDirs se nezapsaly. Zavřete ji a spusťte: napohodu docdirs -c {dataFile} --apply")
+                .ConfigureAwait(false);
+            return false;
+        }
+
+        await output.WriteAsync(DocDirsCli.Apply(plan, options)).ConfigureAwait(false);
+        return true;
+    }
+
+    internal static string FormatResults(IReadOnlyList<FilingResultItem> results, bool docDirsHandled = false)
     {
         var output = new StringBuilder();
         output.AppendLine();
@@ -156,9 +202,9 @@ internal static class FilingCommand
         output.AppendLine(CultureInfo.InvariantCulture,
             $"Přesunuto {results.Count(r => r.Outcome is FilingOutcome.Moved or FilingOutcome.MovedRenamed)}, " +
             $"přeskočeno {results.Count(r => r.Outcome == FilingOutcome.Skipped)}, chyb {results.Count(r => r.Outcome == FilingOutcome.Failed)}.");
-        if (results.Any(r => r.Outcome is FilingOutcome.Moved or FilingOutcome.MovedRenamed && r.Item.Reason != "existující podsložka z Pohody"))
+        if (!docDirsHandled && results.Any(r => r.Outcome is FilingOutcome.Moved or FilingOutcome.MovedRenamed))
         {
-            output.AppendLine("Pozor: nové podsložky dokladů Pohoda zatím nezná – poznačení v databázi (DocDirs) NaPohodu ještě neumí, v Pohodě je poznačte ručně.");
+            output.AppendLine("Pozor: nové podsložky Pohoda nezná, dokud je nepoznačíte v databázi: napohodu docdirs -c <datový soubor> --apply (nebo příště filing --apply --mark-docs).");
         }
 
         return output.ToString();
