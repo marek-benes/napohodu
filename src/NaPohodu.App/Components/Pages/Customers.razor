@@ -1,0 +1,94 @@
+@page "/"
+@inject PohodaSession Session
+@inject NavigationManager Navigation
+
+<PageTitle>Zákazník – NaPohodu</PageTitle>
+
+<div class="page-header">
+    <div>
+        <h1>Výběr zákazníka</h1>
+        <span class="muted">Účetní jednotky z Pohody@(_units is null ? "" : $" · {Format.LoadedAt(_units.LoadedAt)}")</span>
+    </div>
+    <button class="secondary" disabled="@(_busy is not null)" @onclick="() => LoadAsync(refresh: true)">Obnovit z Pohody</button>
+</div>
+
+<div class="toolbar">
+    <input type="search" placeholder="Hledat název, IČ nebo datový soubor…" @bind="_search" @bind:event="oninput" style="min-width: 320px" />
+    <select @bind="_year">
+        <option value="">Všechny roky</option>
+        @foreach (var year in Years)
+        {
+            <option value="@year">@year</option>
+        }
+    </select>
+</div>
+
+<StatusPanel Busy="@_busy" Error="@_error" />
+
+@if (_units is not null)
+{
+    <table>
+        <thead>
+            <tr><th>Název</th><th>IČ</th><th class="right">Rok</th><th>Účetnictví</th><th>Datový soubor</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var unit in Filtered)
+            {
+                <tr class="clickable" @onclick="() => Select(unit)">
+                    <td>@unit.DisplayName</td>
+                    <td>@unit.Ico</td>
+                    <td class="right">@unit.Year</td>
+                    <td>@Format.UnitType(unit.UnitType)</td>
+                    <td class="muted">@unit.DataFile</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <p class="muted">Zobrazeno @Filtered.Count() z @_units.Value.Count jednotek.</p>
+}
+
+@code {
+    private static readonly StringComparer CzechOrder = StringComparer.Create(CultureInfo.GetCultureInfo("cs-CZ"), ignoreCase: true);
+
+    private Loaded<IReadOnlyList<AccountingUnit>>? _units;
+    private string _search = string.Empty;
+    private string _year = string.Empty;
+    private string? _busy;
+    private string? _error;
+
+    private IEnumerable<int> Years =>
+        (_units?.Value ?? []).Select(u => u.Year).OfType<int>().Distinct().OrderDescending();
+
+    private IEnumerable<AccountingUnit> Filtered =>
+        (_units?.Value ?? [])
+            .Where(u => _year.Length == 0 || u.Year?.ToString(CultureInfo.InvariantCulture) == _year)
+            .Where(u => string.IsNullOrWhiteSpace(_search)
+                || u.DisplayName.Contains(_search.Trim(), StringComparison.CurrentCultureIgnoreCase)
+                || (u.Ico ?? "").Contains(_search.Trim(), StringComparison.Ordinal)
+                || u.DataFile.Contains(_search.Trim(), StringComparison.OrdinalIgnoreCase))
+            .OrderBy(u => u.DisplayName, CzechOrder)
+            .ThenByDescending(u => u.Year);
+
+    protected override Task OnInitializedAsync() => LoadAsync(refresh: false);
+
+    private async Task LoadAsync(bool refresh)
+    {
+        _busy = "Načítám účetní jednotky z Pohody…";
+        _error = null;
+        StateHasChanged();
+        try
+        {
+            _units = await Session.GetUnitsAsync(refresh);
+        }
+        catch (PohodaException ex)
+        {
+            _error = ex.Message;
+        }
+        finally
+        {
+            _busy = null;
+        }
+    }
+
+    private void Select(AccountingUnit unit) => Navigation.NavigateTo($"z/{Uri.EscapeDataString(unit.DataFile)}");
+}

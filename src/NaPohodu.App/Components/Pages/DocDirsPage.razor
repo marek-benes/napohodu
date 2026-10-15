@@ -1,0 +1,158 @@
+@page "/z/{DataFile}/dokumenty"
+@inherits UnitPageBase
+
+<PageTitle>Poznačení v Pohodě – NaPohodu</PageTitle>
+
+<UnitHeader Title="Poznačení dokumentů v Pohodě" Unit="Unit" DataFile="@DataFile" />
+
+<p class="muted">
+    Porovná podsložky přijatých faktur na disku s poznačením v databázi Pohody (záložka Dokumenty).
+    Dokumenty jsou společné pro všechny roky, poznačuje se každý ročník zvlášť. Existující jiné poznačení se nikdy nepřepisuje.
+</p>
+
+<div class="form-row">
+    <label for="folder">Složka firmy v Dokumentech <span class="muted">(nepovinné – jinak se zjistí z Pohody)</span></label>
+    <input id="folder" type="text" @bind="_manualFolder" />
+</div>
+<div class="toolbar">
+    <button disabled="@(Busy is not null || Unit is null)" @onclick="PlanAsync">Porovnat</button>
+</div>
+
+<StatusPanel Busy="@Busy" Error="@Error" />
+
+@if (_plan is not null)
+{
+    <p class="muted">Složka firmy: @_companyFolder · datový soubor: @_plan.MdbPath</p>
+    var changes = _plan.Items.Where(i => i.Action != DocDirAction.AlreadyMarked).ToList();
+    @if (changes.Count > 0)
+    {
+        <table>
+            <thead><tr><th>Faktura</th><th>Akce</th><th>Podsložka</th><th>Nyní v Pohodě</th></tr></thead>
+            <tbody>
+                @foreach (var item in changes)
+                {
+                    <tr>
+                        <td class="nowrap">@item.Target.InvoiceNumber</td>
+                        <td><span class="badge @Css(item.Action)">@Describe(item.Action)</span></td>
+                        <td>@item.Target.Dir</td>
+                        <td class="muted">@item.CurrentDir</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    <p>
+        Vložit @_plan.Count(DocDirAction.Insert), doplnit @_plan.Count(DocDirAction.Update), už poznačeno @_plan.Count(DocDirAction.AlreadyMarked),
+        konflikt @_plan.Count(DocDirAction.Conflict) (nepřepisuje se).
+        @if (_duplicates.Count > 0)
+        {
+            <br /><span class="badge warn">Číslo ve více složkách na disku (přeskočeno, vyřešte ručně): @string.Join(", ", _duplicates)</span>
+        }
+        @if (_notInDataFile.Count > 0)
+        {
+            <br /><span class="muted">Složky bez faktury v tomto ročníku (jiný rok?): @_notInDataFile.Count</span>
+        }
+    </p>
+
+    @if (_plan.Writes.Any() && _written is null)
+    {
+        @if (_locked)
+        {
+            <div class="alert warn">Jednotka je otevřená v Pohodě (existuje zámek .ldb). Zavřete ji na všech stanicích a porovnejte znovu.</div>
+        }
+        <div class="toolbar">
+            <button disabled="@(Busy is not null || _locked)" @onclick="ApplyAsync">Zapsat do Pohody (@_plan.Writes.Count())</button>
+            <span class="muted">Před zápisem se vytvoří záloha do @Options.EffectiveBackupPath.</span>
+        </div>
+    }
+}
+
+@if (_written is not null)
+{
+    <div class="alert ok">
+        Zapsáno: vloženo @_written.Inserted, doplněno @_written.Updated. Záloha: @_written.BackupPath
+        @foreach (var change in _written.Changed)
+        {
+            <br />@change
+        }
+        <br />Ověřte v Pohodě záložku Dokumenty u některé z dotčených faktur.
+    </div>
+}
+
+@code {
+    private string _manualFolder = string.Empty;
+    private string? _companyFolder;
+    private DocDirsPlan? _plan;
+    private IReadOnlyList<string> _duplicates = [];
+    private IReadOnlyList<string> _notInDataFile = [];
+    private bool _locked;
+    private DocDirsWriteResult? _written;
+
+    private async Task PlanAsync()
+    {
+        if (Unit is not { } unit)
+        {
+            return;
+        }
+
+        _plan = null;
+        _written = null;
+        if (string.IsNullOrWhiteSpace(Options.DataPath))
+        {
+            Error = "Není nastavena složka s daty Pohody (Pohoda:DataPath).";
+            return;
+        }
+
+        await RunAsync("Porovnávám složky na disku s databází Pohody…", async () =>
+        {
+            var invoices = await Session.GetInvoicesAsync(unit);
+            var folder = PohodaSession.ResolveCompanyFolder(unit, invoices.Value, Options.DocumentsPath, _manualFolder);
+            if (folder.Path is not { } companyFolder)
+            {
+                throw new PohodaException($"Složku firmy nelze určit ({folder.Source}). Zadejte ji ručně.");
+            }
+
+            var mdbPath = PohodaDataFile.PathFor(Options.DataPath, unit.DataFile);
+            (_plan, _duplicates, _notInDataFile) = await Task.Run(() =>
+            {
+                var snapshot = DocDirsSnapshot.Read(mdbPath);
+                var scan = DocumentFolderScanner.Scan(companyFolder);
+                var targets = DocDirsTargets.FromDisk(scan, snapshot, out var notInDataFile);
+                return (DocDirsPlanner.Plan(mdbPath, snapshot, targets), scan.Duplicates, notInDataFile);
+            });
+            _companyFolder = companyFolder;
+            _locked = PohodaDataFile.FindLock(mdbPath) is not null;
+        });
+    }
+
+    private async Task ApplyAsync()
+    {
+        if (_plan is not { } plan)
+        {
+            return;
+        }
+
+        await RunAsync("Zapisuji do databáze Pohody…", async () =>
+        {
+            _written = await Task.Run(() => DocDirsWriter.Apply(plan, Options.EffectiveBackupPath, Options.BackupsToKeep));
+        });
+    }
+
+    private static string Describe(DocDirAction action) => action switch
+    {
+        DocDirAction.Insert => "vložit",
+        DocDirAction.Update => "doplnit",
+        DocDirAction.Conflict => "konflikt",
+        DocDirAction.MissingInvoice => "faktura není v ročníku",
+        _ => "už poznačeno",
+    };
+
+    private static string Css(DocDirAction action) => action switch
+    {
+        DocDirAction.Insert or DocDirAction.Update => "info",
+        DocDirAction.Conflict => "warn",
+        DocDirAction.MissingInvoice => "error",
+        _ => "ok",
+    };
+}

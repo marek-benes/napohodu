@@ -1,0 +1,202 @@
+@page "/z/{DataFile}/zatrideni"
+@inherits UnitPageBase
+
+<PageTitle>Zatřídění faktur – NaPohodu</PageTitle>
+
+<UnitHeader Title="Zatřídění přijatých faktur" Unit="Unit" DataFile="@DataFile" />
+
+<p class="muted">
+    Soubory pojmenované číslem faktury (např. <code>251100001.pdf</code> nebo <code>251100001_dodaci_list.pdf</code>)
+    se přesunou do podsložky faktury v Dokumentech Pohody. Nic se nepřepisuje.
+</p>
+
+<div class="form-row">
+    <label for="source">Složka se soubory faktur</label>
+    <input id="source" type="text" placeholder="např. C:\Users\…\Downloads\faktury" @bind="_source" />
+</div>
+<div class="form-row">
+    <label for="folder">Složka firmy v Dokumentech <span class="muted">(nepovinné – jinak se zjistí z Pohody)</span></label>
+    <input id="folder" type="text" @bind="_manualFolder" />
+</div>
+<div class="toolbar">
+    <button disabled="@(Busy is not null || Unit is null || string.IsNullOrWhiteSpace(_source))" @onclick="PlanAsync">Načíst plán</button>
+</div>
+
+<StatusPanel Busy="@Busy" Error="@Error" />
+
+@if (_plan is not null)
+{
+    <div class="alert @(_plan.CompanyFolder.IsResolved ? "info" : "warn")">
+        Složka firmy: <strong>@(_plan.CompanyFolder.Path ?? "neurčena")</strong> – @_plan.CompanyFolder.Source
+        @foreach (var candidate in _plan.CompanyFolder.Candidates)
+        {
+            <br />@($"kandidát: {candidate}")
+        }
+        @if (!_plan.CompanyFolder.IsResolved)
+        {
+            <br />@("Zadejte složku firmy ručně a načtěte plán znovu.")
+        }
+    </div>
+
+    @if (_plan.Items.Count > 0)
+    {
+        <table>
+            <thead>
+                <tr><th>Soubor</th><th>Faktura</th><th>Stav</th><th>Podsložka / důvod</th><th>Při kolizi</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var item in _plan.Items)
+                {
+                    <tr>
+                        <td>@item.FileName</td>
+                        <td class="nowrap">@item.InvoiceNumber</td>
+                        <td><StatusBadge Status="item.Status" /></td>
+                        <td class="@(item.Status == FilingStatus.Unresolved ? "" : "muted")">@(item.Status == FilingStatus.Unresolved ? item.Reason : item.SubFolder)</td>
+                        <td>
+                            @if (item.Status == FilingStatus.Conflict)
+                            {
+                                <select value="@_decisions.GetValueOrDefault(item.SourcePath)" @onchange="e => _decisions[item.SourcePath] = Enum.Parse<ConflictMode>((string)e.Value!)">
+                                    <option value="@ConflictMode.Skip">Přeskočit</option>
+                                    <option value="@ConflictMode.KeepBoth">Ponechat oba</option>
+                                </select>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    <p>
+        Spárováno @_plan.Items.Count: připraveno @_plan.Count(FilingStatus.Ready), už zatříděno @_plan.Count(FilingStatus.AlreadyFiled),
+        kolize @_plan.Count(FilingStatus.Conflict), nelze určit @_plan.Count(FilingStatus.Unresolved).
+        @if (_plan.Unmatched.Count > 0)
+        {
+            <br /><span class="muted">Nespárováno @_plan.Unmatched.Count (název neodpovídá faktuře ročníku): @string.Join(", ", _plan.Unmatched)</span>
+        }
+    </p>
+
+    @if (_results is null)
+    {
+        <div class="toolbar">
+            <label><input type="checkbox" @bind="_markDocs" /> Po přesunu poznačit podsložky v Pohodě (jednotka musí být v Pohodě zavřená)</label>
+        </div>
+        <div class="toolbar">
+            <button disabled="@(Busy is not null || ToMove == 0)" @onclick="ExecuteAsync">Přesunout @ToMove @(ToMove == 1 ? "soubor" : "souborů")</button>
+        </div>
+    }
+}
+
+@if (_results is not null)
+{
+    var moved = _results.Count(r => r.Outcome is FilingOutcome.Moved or FilingOutcome.MovedRenamed);
+    var failed = _results.Where(r => r.Outcome == FilingOutcome.Failed).ToList();
+    <div class="alert @(failed.Count > 0 ? "error" : "ok")">
+        Přesunuto @moved, přeskočeno @_results.Count(r => r.Outcome == FilingOutcome.Skipped), chyb @failed.Count.
+        @foreach (var r in failed)
+        {
+            <br />@($"{r.Item.FileName}: {r.Message}")
+        }
+    </div>
+}
+
+@if (_markMessage is not null)
+{
+    <div class="alert @_markClass">@_markMessage</div>
+}
+
+@code {
+    private string _source = string.Empty;
+    private string _manualFolder = string.Empty;
+    private bool _markDocs = true;
+    private FilingPlan? _plan;
+    private IReadOnlyList<FilingResultItem>? _results;
+    private Dictionary<string, ConflictMode> _decisions = [];
+    private string? _markMessage;
+    private string _markClass = "info";
+
+    private int ToMove =>
+        _plan?.Items.Count(i => i.Status == FilingStatus.Ready
+            || (i.Status == FilingStatus.Conflict && _decisions.GetValueOrDefault(i.SourcePath) == ConflictMode.KeepBoth)) ?? 0;
+
+    private async Task PlanAsync()
+    {
+        if (Unit is not { } unit)
+        {
+            return;
+        }
+
+        _plan = null;
+        _results = null;
+        _markMessage = null;
+        _decisions = [];
+        await RunAsync("Načítám faktury a připravuji plán…", async () =>
+        {
+            var invoices = await Session.GetInvoicesAsync(unit);
+            var folder = PohodaSession.ResolveCompanyFolder(unit, invoices.Value, Options.DocumentsPath, _manualFolder);
+            var source = _source.Trim().Trim('"');
+            _plan = await Task.Run(() => FilingPlanner.Plan(source, invoices.Value, folder));
+        });
+    }
+
+    private async Task ExecuteAsync()
+    {
+        if (_plan is not { } plan || Unit is not { } unit)
+        {
+            return;
+        }
+
+        await RunAsync("Přesouvám soubory…", async () =>
+        {
+            var decisions = new Dictionary<string, ConflictMode>(_decisions);
+            _results = await Task.Run(() => FilingExecutor.Execute(plan, item => decisions.GetValueOrDefault(item.SourcePath)));
+            Session.Invalidate(unit);
+            if (_markDocs)
+            {
+                await MarkDocsAsync(unit, _results);
+            }
+            else if (_results.Any(r => r.Outcome is FilingOutcome.Moved or FilingOutcome.MovedRenamed))
+            {
+                (_markClass, _markMessage) = ("warn", "Nové podsložky Pohoda nezná, dokud je nepoznačíte (stránka Poznačení v Pohodě).");
+            }
+        });
+    }
+
+    // Selhání poznačení (typicky otevřená jednotka) přesun neruší: soubory už jsou na místě.
+    private async Task MarkDocsAsync(AccountingUnit unit, IReadOnlyList<FilingResultItem> results)
+    {
+        if (string.IsNullOrWhiteSpace(Options.DataPath))
+        {
+            (_markClass, _markMessage) = ("warn", "Poznačení v Pohodě nelze provést: není nastavena složka s daty Pohody (Pohoda:DataPath).");
+            return;
+        }
+
+        try
+        {
+            var mdbPath = PohodaDataFile.PathFor(Options.DataPath, unit.DataFile);
+            var plan = await Task.Run(() => DocDirsPlanner.Plan(mdbPath, DocDirsSnapshot.Read(mdbPath), DocDirsTargets.FromFiling(results)));
+            if (!plan.Writes.Any())
+            {
+                (_markClass, _markMessage) = ("ok", $"Poznačení v Pohodě je aktuální (už poznačeno {plan.Count(DocDirAction.AlreadyMarked)}).");
+                return;
+            }
+
+            if (PohodaDataFile.FindLock(mdbPath) is not null)
+            {
+                (_markClass, _markMessage) = ("warn",
+                    "Jednotka je otevřená v Pohodě, poznačení se nezapsalo. Zavřete ji a dokončete to na stránce Poznačení v Pohodě.");
+                return;
+            }
+
+            var written = await Task.Run(() => DocDirsWriter.Apply(plan, Options.EffectiveBackupPath, Options.BackupsToKeep));
+            var conflicts = plan.Count(DocDirAction.Conflict);
+            (_markClass, _markMessage) = ("ok",
+                $"V Pohodě poznačeno {written.Inserted + written.Updated} faktur (záloha {written.BackupPath})."
+                + (conflicts > 0 ? $" Pozor: {conflicts} faktur je poznačeno jinam – zkontrolujte ručně." : ""));
+        }
+        catch (PohodaException ex)
+        {
+            (_markClass, _markMessage) = ("error", $"Poznačení v Pohodě se nepodařilo: {ex.Message}\nDokončete ho na stránce Poznačení v Pohodě.");
+        }
+    }
+}

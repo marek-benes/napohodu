@@ -33,9 +33,14 @@ public static class FilingExecutor
 {
     private const int MaxRenameAttempts = 1000;
 
-    public static IReadOnlyList<FilingResultItem> Execute(FilingPlan plan, ConflictMode conflictMode = ConflictMode.Skip)
+    public static IReadOnlyList<FilingResultItem> Execute(FilingPlan plan, ConflictMode conflictMode = ConflictMode.Skip) =>
+        Execute(plan, _ => conflictMode);
+
+    /// <param name="decideConflict">Rozhodnutí pro každý soubor v konfliktu zvlášť (UI se ptá po souborech).</param>
+    public static IReadOnlyList<FilingResultItem> Execute(FilingPlan plan, Func<FilingPlanItem, ConflictMode> decideConflict)
     {
         ArgumentNullException.ThrowIfNull(plan);
+        ArgumentNullException.ThrowIfNull(decideConflict);
 
         var results = new List<FilingResultItem>(plan.Items.Count);
         foreach (var item in plan.Items)
@@ -43,7 +48,7 @@ public static class FilingExecutor
             results.Add(item.Status switch
             {
                 FilingStatus.Ready => Move(item, item.TargetPath!, FilingOutcome.Moved),
-                FilingStatus.Conflict when conflictMode == ConflictMode.KeepBoth => Move(item, FreeName(item.TargetPath!), FilingOutcome.MovedRenamed),
+                FilingStatus.Conflict when decideConflict(item) == ConflictMode.KeepBoth => Move(item, FreeName(item.TargetPath!), FilingOutcome.MovedRenamed),
                 FilingStatus.Conflict => new(item, FilingOutcome.Skipped, item.TargetPath, "v cíli je jiný soubor se stejným názvem"),
                 FilingStatus.AlreadyFiled => new(item, FilingOutcome.Skipped, item.TargetPath, "v cíli už je stejný soubor"),
                 _ => new(item, FilingOutcome.Skipped, null, item.Reason),

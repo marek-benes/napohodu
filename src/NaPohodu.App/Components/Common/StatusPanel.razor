@@ -1,0 +1,17 @@
+@* Probíhající operace (spinner) a chyba; společné pro všechny stránky. *@
+@if (Busy is not null)
+{
+    <div class="alert info"><span class="spinner"></span>@Busy</div>
+}
+@if (Error is not null)
+{
+    <div class="alert error">@Error</div>
+}
+
+@code {
+    [Parameter]
+    public string? Busy { get; set; }
+
+    [Parameter]
+    public string? Error { get; set; }
+}

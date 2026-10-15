@@ -1,0 +1,79 @@
+@page "/z/{DataFile}/faktury"
+@inherits UnitPageBase
+
+<PageTitle>Přijaté faktury – NaPohodu</PageTitle>
+
+<UnitHeader Title="Přijaté faktury" Unit="Unit" DataFile="@DataFile">
+    <button class="secondary" disabled="@(Busy is not null || Unit is null)" @onclick="() => LoadAsync(refresh: true)">Obnovit z Pohody</button>
+</UnitHeader>
+
+<StatusPanel Busy="@Busy" Error="@Error" />
+
+@if (_invoices is not null)
+{
+    var list = _invoices.Value;
+    <p class="muted">
+        @list.Count faktur · s dokumenty @list.Count(i => i.Documents is not null) · @Format.LoadedAt(_invoices.LoadedAt)
+    </p>
+    <table>
+        <thead>
+            <tr>
+                <th>Číslo</th><th>Datum</th><th>DUZP</th><th>Splatnost</th><th>Dodavatel</th><th>IČ</th>
+                <th class="right">Celkem</th><th>Uhrazeno</th><th>Dokumenty</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var invoice in list.OrderByDescending(i => i.Date).ThenByDescending(i => i.Number, StringComparer.Ordinal))
+            {
+                <tr>
+                    <td class="nowrap">@invoice.Number</td>
+                    <td class="nowrap">@Format.Date(invoice.Date)</td>
+                    <td class="nowrap">@Format.Date(invoice.DateTax)</td>
+                    <td class="nowrap">@Format.Date(invoice.DateDue)</td>
+                    <td>@invoice.PartnerDisplayName</td>
+                    <td>@invoice.PartnerIco</td>
+                    <td class="right nowrap">@Format.Total(invoice)</td>
+                    <td class="nowrap">
+                        @if (invoice.LiquidationDate is { } paid)
+                        {
+                            <span class="badge ok">@Format.Date(paid)</span>
+                        }
+                        else
+                        {
+                            <span class="badge warn">neuhrazeno</span>
+                        }
+                    </td>
+                    <td>
+                        @if (invoice.Documents is { } documents)
+                        {
+                            <span title="@documents.SubFolder">@documents.Files.Count @(documents.Files.Count == 1 ? "soubor" : "soubory")</span>
+                        }
+                        else
+                        {
+                            <span class="muted">–</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private Loaded<IReadOnlyList<Invoice>>? _invoices;
+
+    protected override Task OnUnitLoadedAsync(AccountingUnit unit) => LoadAsync(refresh: false);
+
+    private async Task LoadAsync(bool refresh)
+    {
+        if (Unit is not { } unit)
+        {
+            return;
+        }
+
+        await RunAsync("Načítám přijaté faktury z Pohody…", async () =>
+        {
+            _invoices = await Session.GetInvoicesAsync(unit, refresh);
+        });
+    }
+}

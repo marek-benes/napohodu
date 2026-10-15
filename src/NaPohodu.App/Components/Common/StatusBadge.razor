@@ -1,0 +1,23 @@
+@* Stav souboru v plánu zatřídění. *@
+<span class="badge @Css">@Text</span>
+
+@code {
+    [Parameter]
+    public FilingStatus Status { get; set; }
+
+    private string Css => Status switch
+    {
+        FilingStatus.Ready => "info",
+        FilingStatus.AlreadyFiled => "ok",
+        FilingStatus.Conflict => "warn",
+        _ => "error",
+    };
+
+    private string Text => Status switch
+    {
+        FilingStatus.Ready => "připraveno",
+        FilingStatus.AlreadyFiled => "už zatříděno",
+        FilingStatus.Conflict => "kolize",
+        _ => "nelze určit",
+    };
+}

@@ -14,7 +14,7 @@ public sealed class PohodaXmlRunnerTests : IDisposable
 {
     private readonly DirectoryInfo _dir = Directory.CreateTempSubdirectory("napohodu-tests-");
 
-    public void Dispose() => _dir.Delete(recursive: true);
+    public void Dispose() => Filing.TempDirectory.DeleteWithRetry(_dir.FullName);
 
     [Fact]
     public async Task RunAsync_PassesArgumentsAndReadsResponse()

@@ -1,0 +1,26 @@
+@* Hlavička stránky zákazníka: název, IČ, ročník. *@
+<div class="page-header">
+    <div>
+        <span class="muted">@Title</span>
+        <h1>@(Unit?.DisplayName ?? DataFile)</h1>
+        @if (Unit is not null)
+        {
+            <span class="muted">IČ @Unit.Ico · ročník @Unit.Year · @Format.UnitType(Unit.UnitType) · @Unit.DataFile</span>
+        }
+    </div>
+    @ChildContent
+</div>
+
+@code {
+    [Parameter]
+    public string Title { get; set; } = "Zákazník";
+
+    [Parameter]
+    public AccountingUnit? Unit { get; set; }
+
+    [Parameter]
+    public string DataFile { get; set; } = string.Empty;
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

@@ -86,4 +86,11 @@ Mapování modulů `napohodu-electron/src` → nová generace:
    - **`Core/Mdb` hotovo 2026-10-15**: čtení `FA`/`DocDirs` (sdíleně), plán (vložit / doplnit / už poznačeno / konflikt / faktura není v ročníku), zápis se zálohou mimo datovou složku, exkluzivně, v transakci s opětovnou kontrolou. CLI `napohodu docdirs` (rekonciliace) a `filing --apply --mark-docs`. Ověřeno na **kopii** reálné `08215839_2025.mdb` (35 vazeb sedí, 1 duplicitní složka na disku, INSERT přes AutoNumber, UPDATE prázdného Dir, konflikt nedotčen). **Zápis do ostrého datového souboru zatím neproběhl** – po prvním ostrém zápisu ověřit záložku Dokumenty v Pohodě.
    - V datové složce Pohody zůstala záloha z 1. generace `08215839_2025.backup-20260727163103..mdb` (chyba č. 6) – smazat ručně, až nebude potřeba.
    - **Export pro kontrolu hotovo 2026-10-15** (`Core/Filing/AuditExport`, CLI `napohodu audit-export`): období podle DUZP (jako 1. generace), zdroj = `subFolder` z Pohody, kopie do ploché složky; názvy bez čísla faktury dostanou prefix čísla (oprava chyby č. 8), cíl se nepřepisuje, opakování nekopíruje znovu; hlásí faktury bez dokumentů a soubory, které Pohoda eviduje, ale na disku chybí.
-   - Zbývá: Blazor `serve`.
+   - **Blazor `serve` hotovo 2026-10-15**: stránky Výběr zákazníka, rozcestník, Přijaté faktury, Zatřídění (plán, kolize po souborech, přesun + automatické poznačení DocDirs jako v 1. generaci), Poznačení v Pohodě, Export pro kontrolu (výchozí období = minulý měsíc). Ověřeno v prohlížeči proti reálné Pohodě jen v režimu čtení (SafetyLine 2025: faktury, plán zatřídění, porovnání DocDirs, náhled exportu); přesun ani zápis z UI zatím neproběhl. Ověřeno i z publikované verze (statické soubory z `wwwroot`).
+   - „Export pro zákazníka“ je v UI jako „Připravujeme“ (otevřená otázka, co má obsahovat).
+
+## Další možné kroky
+
+- Plán rozšíření 1: plánované úlohy (Task Scheduler) nad CLI – co přesně automatizovat.
+- Otevřené otázky výše (dobropisy a zálohové faktury, distribuce exe, více stanic).
+- První ostrý zápis DocDirs ověřit v Pohodě; smazat duplicitní složku `SafetyLine\…\2511\251100001` (totožná kopie, Pohoda odkazuje na plochou) a zálohu 1. generace v datové složce.

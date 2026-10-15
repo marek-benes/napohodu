@@ -1,0 +1,138 @@
+@page "/z/{DataFile}/export-kontrola"
+@inherits UnitPageBase
+
+<PageTitle>Export pro kontrolu – NaPohodu</PageTitle>
+
+<UnitHeader Title="Export pro kontrolu" Unit="Unit" DataFile="@DataFile" />
+
+<p class="muted">
+    Zkopíruje soubory přijatých faktur s datem zdanitelného plnění v období do jedné složky. Dokumenty v Pohodě se nemění,
+    v cílové složce se nic nepřepisuje.
+</p>
+
+<div class="toolbar">
+    <label>DUZP od <input type="date" @bind="_from" /></label>
+    <label>do <input type="date" @bind="_to" /></label>
+    <button class="secondary" @onclick="PreviousMonth">Minulý měsíc</button>
+</div>
+<div class="form-row">
+    <label for="dest">Cílová složka</label>
+    <input id="dest" type="text" placeholder="např. C:\Users\…\Desktop\kontrola" @bind="_destination" />
+</div>
+<div class="form-row">
+    <label for="folder">Složka firmy v Dokumentech <span class="muted">(nepovinné – jinak se zjistí z Pohody)</span></label>
+    <input id="folder" type="text" @bind="_manualFolder" />
+</div>
+<div class="toolbar">
+    <button disabled="@(Busy is not null || Unit is null)" @onclick="PlanAsync">Vyhledat soubory</button>
+</div>
+
+<StatusPanel Busy="@Busy" Error="@Error" />
+
+@if (_plan is not null)
+{
+    <p>
+        Faktur v období @_plan.Invoices.Count, souborů @_plan.Files.Count, faktur bez dokumentů @_plan.WithoutDocuments.Count.
+        @if (_plan.WithoutDocuments.Count > 0)
+        {
+            <br /><span class="muted">Bez dokumentů: @string.Join(", ", _plan.WithoutDocuments)</span>
+        }
+    </p>
+    @foreach (var missing in _plan.MissingFiles)
+    {
+        <div class="alert warn">Pohoda eviduje, ale na disku chybí: @missing</div>
+    }
+
+    @if (_plan.Files.Count > 0)
+    {
+        <table>
+            <thead><tr><th>Faktura</th><th>Soubor v exportu</th><th>Zdroj</th></tr></thead>
+            <tbody>
+                @foreach (var file in _plan.Files)
+                {
+                    <tr><td class="nowrap">@file.InvoiceNumber</td><td>@file.ExportName</td><td class="muted">@file.SourcePath</td></tr>
+                }
+            </tbody>
+        </table>
+        @if (_results is null)
+        {
+            <div class="toolbar">
+                <button disabled="@(Busy is not null || string.IsNullOrWhiteSpace(_destination))" @onclick="ExportAsync">Zkopírovat @_plan.Files.Count souborů</button>
+            </div>
+        }
+    }
+}
+
+@if (_results is not null)
+{
+    var failed = _results.Where(r => r.Outcome == AuditExportOutcome.Failed).ToList();
+    <div class="alert @(failed.Count > 0 ? "error" : "ok")">
+        Zkopírováno @_results.Count(r => r.Outcome is AuditExportOutcome.Copied or AuditExportOutcome.CopiedRenamed),
+        už v cíli @_results.Count(r => r.Outcome == AuditExportOutcome.AlreadyThere), chyb @failed.Count.
+        @foreach (var r in failed)
+        {
+            <br />@($"{r.File.ExportName}: {r.Error}")
+        }
+    </div>
+}
+
+@code {
+    private DateOnly? _from;
+    private DateOnly? _to;
+    private string _destination = string.Empty;
+    private string _manualFolder = string.Empty;
+    private AuditExportPlan? _plan;
+    private IReadOnlyList<AuditExportResultItem>? _results;
+
+    protected override void OnInitialized() => PreviousMonth();
+
+    // Kontrola se typicky dělá za uzavřený měsíc.
+    private void PreviousMonth()
+    {
+        var today = DateOnly.FromDateTime(DateTime.Today);
+        var firstOfThisMonth = new DateOnly(today.Year, today.Month, 1);
+        (_from, _to) = (firstOfThisMonth.AddMonths(-1), firstOfThisMonth.AddDays(-1));
+        (_plan, _results) = (null, null);
+    }
+
+    private async Task PlanAsync()
+    {
+        if (Unit is not { } unit)
+        {
+            return;
+        }
+
+        (_plan, _results) = (null, null);
+        if (_from > _to)
+        {
+            Error = "Datum od je po datu do.";
+            return;
+        }
+
+        await RunAsync("Načítám faktury a hledám soubory…", async () =>
+        {
+            var invoices = await Session.GetInvoicesAsync(unit);
+            var folder = PohodaSession.ResolveCompanyFolder(unit, invoices.Value, Options.DocumentsPath, _manualFolder);
+            if (folder.Path is not { } companyFolder)
+            {
+                throw new PohodaException($"Složku firmy nelze určit ({folder.Source}). Zadejte ji ručně.");
+            }
+
+            _plan = await Task.Run(() => AuditExport.Plan(invoices.Value, companyFolder, _from, _to));
+        });
+    }
+
+    private async Task ExportAsync()
+    {
+        if (_plan is not { } plan)
+        {
+            return;
+        }
+
+        var destination = _destination.Trim().Trim('"');
+        await RunAsync("Kopíruji soubory…", async () =>
+        {
+            _results = await Task.Run(() => AuditExport.Execute(plan, destination));
+        });
+    }
+}

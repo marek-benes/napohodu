@@ -1,0 +1,80 @@
+@inherits LayoutComponentBase
+@implements IDisposable
+@inject NavigationManager Navigation
+
+<div class="shell">
+    <aside class="sidebar">
+        <div class="brand">
+            <a href="">NaPohodu</a>
+            <small>doplněk k POHODĚ</small>
+        </div>
+        <nav>
+            <NavLink href="" Match="NavLinkMatch.All">Zákazník</NavLink>
+            @foreach (var (path, label) in Features)
+            {
+                @if (_dataFile is null)
+                {
+                    <span class="disabled" title="Nejdříve vyberte zákazníka">@label</span>
+                }
+                else
+                {
+                    <NavLink href="@($"z/{Uri.EscapeDataString(_dataFile)}{path}")" Match="NavLinkMatch.All">@label</NavLink>
+                }
+            }
+        </nav>
+        @if (_dataFile is not null)
+        {
+            <a class="active-customer" href="@($"z/{Uri.EscapeDataString(_dataFile)}")">
+                <small>Aktivní zákazník</small>
+                <span>@_dataFile</span>
+            </a>
+        }
+    </aside>
+    <main>
+        <ErrorBoundary @ref="_errorBoundary">
+            <ChildContent>@Body</ChildContent>
+            <ErrorContent Context="ex">
+                <div class="alert error">
+                    <strong>Neočekávaná chyba:</strong> @ex.Message
+                    <button class="secondary" @onclick="() => _errorBoundary?.Recover()">Zkusit znovu</button>
+                </div>
+            </ErrorContent>
+        </ErrorBoundary>
+    </main>
+</div>
+
+@code {
+    // Funkce dostupné po výběru zákazníka; zákazník je součástí adresy (/z/<datový soubor>/…),
+    // takže obnovení stránky ho neztratí.
+    private static readonly (string Path, string Label)[] Features =
+    [
+        ("/faktury", "Přijaté faktury"),
+        ("/zatrideni", "Zatřídění faktur"),
+        ("/dokumenty", "Poznačení v Pohodě"),
+        ("/export-kontrola", "Export pro kontrolu"),
+    ];
+
+    private string? _dataFile;
+    private ErrorBoundary? _errorBoundary;
+
+    protected override void OnInitialized()
+    {
+        Navigation.LocationChanged += OnLocationChanged;
+        _dataFile = DataFileFromUri(Navigation.Uri);
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        _dataFile = DataFileFromUri(e.Location);
+        _errorBoundary?.Recover();
+        StateHasChanged();
+    }
+
+    private string? DataFileFromUri(string uri)
+    {
+        var segments = Navigation.ToBaseRelativePath(uri).Split('?', '#')[0].Split('/', StringSplitOptions.RemoveEmptyEntries);
+        return segments is ["z", var dataFile, ..] ? Uri.UnescapeDataString(dataFile) : null;
+    }
+
+    public void Dispose() => Navigation.LocationChanged -= OnLocationChanged;
+}

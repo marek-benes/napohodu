@@ -1,0 +1,36 @@
+@page "/z/{DataFile}"
+@inherits UnitPageBase
+
+<PageTitle>@(Unit?.DisplayName ?? DataFile) – NaPohodu</PageTitle>
+
+<UnitHeader Unit="Unit" DataFile="@DataFile">
+    <a href="" class="badge">Změnit zákazníka</a>
+</UnitHeader>
+
+<StatusPanel Busy="@Busy" Error="@Error" />
+
+@if (Unit is not null)
+{
+    <div class="tiles">
+        <a class="tile" href="@($"z/{Uri.EscapeDataString(DataFile)}/faktury")">
+            <strong>Přijaté faktury</strong>
+            <span class="muted">Přehled faktur ročníku a jejich dokumentů v Pohodě.</span>
+        </a>
+        <a class="tile" href="@($"z/{Uri.EscapeDataString(DataFile)}/zatrideni")">
+            <strong>Zatřídění faktur</strong>
+            <span class="muted">Přesuňte soubory přijatých faktur do Dokumentů Pohody a poznačte je.</span>
+        </a>
+        <a class="tile" href="@($"z/{Uri.EscapeDataString(DataFile)}/dokumenty")">
+            <strong>Poznačení v Pohodě</strong>
+            <span class="muted">Srovnejte poznačení dokumentů v Pohodě se složkami na disku.</span>
+        </a>
+        <a class="tile" href="@($"z/{Uri.EscapeDataString(DataFile)}/export-kontrola")">
+            <strong>Export pro kontrolu</strong>
+            <span class="muted">Zkopírujte soubory přijatých faktur za období do jedné složky.</span>
+        </a>
+        <div class="tile soon">
+            <strong>Export pro zákazníka</strong>
+            <span>Připravujeme.</span>
+        </div>
+    </div>
+}

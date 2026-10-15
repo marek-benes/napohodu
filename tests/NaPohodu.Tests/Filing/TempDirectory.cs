@@ -22,5 +22,22 @@ internal sealed class TempDirectory : IDisposable
         return path;
     }
 
-    public void Dispose() => Directory.Delete(Path, recursive: true);
+    public void Dispose() => DeleteWithRetry(Path);
+
+    /// <summary>Smaže adresář; ukončený proces (např. ping v testu timeoutu) může soubory chvíli držet.</summary>
+    public static void DeleteWithRetry(string path)
+    {
+        for (var attempt = 1; ; attempt++)
+        {
+            try
+            {
+                Directory.Delete(path, recursive: true);
+                return;
+            }
+            catch (IOException) when (attempt < 10)
+            {
+                Thread.Sleep(200);
+            }
+        }
+    }
 }
