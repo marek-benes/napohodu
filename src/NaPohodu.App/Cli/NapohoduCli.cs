@@ -16,6 +16,7 @@ internal static class NapohoduCli
         root.Subcommands.Add(InvoicesCommand.Create(services));
         root.Subcommands.Add(FilingCommand.Create(services));
         root.Subcommands.Add(DocDirsCommand.Create(services));
+        root.Subcommands.Add(AuditExportCommand.Create(services));
         root.Subcommands.Add(ConfigCommand.Create(services));
         return root;
     }
