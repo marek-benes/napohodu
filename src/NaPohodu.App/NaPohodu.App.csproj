@@ -4,6 +4,8 @@
     <OutputType>Exe</OutputType>
     <AssemblyName>napohodu</AssemblyName>
     <RootNamespace>NaPohodu.App</RootNamespace>
+    <!-- dotnet run: relativní cesty (např. --save-response) vůči složce, odkud se příkaz spouští, ne vůči projektu. -->
+    <RunWorkingDirectory>$(MSBuildStartupDirectory)</RunWorkingDirectory>
   </PropertyGroup>
 
   <ItemGroup>
