@@ -77,5 +77,5 @@ Mapování modulů `napohodu-electron/src` → nová generace:
    - zda `Pohoda.exe` vrací chybové kódy 1xx/5xx jako návratový kód procesu, nebo jen v odpovědi,
    - zda export faktur projde bez `ico` v dataPack (jen `database` v INI),
    - skutečný tvar `number/ids`, `companyDocumentsFolder` a `subFolder` (viz otevřené otázky).
-3. `App`: CLI `napohodu customers` a `napohodu invoices --customer <dataFile> [--from --to]` s tabulkovým výstupem. Tím se ověří komunikace na Windows a získají reálné odpovědi jako fixtures (anonymizovat před commitem).
+3. ~~`App`: CLI `napohodu customers` a `napohodu invoices --customer <dataFile> [--from --to]` s tabulkovým výstupem.~~ Hotovo 2026-10-15 (+ `napohodu config`, `--save-response`). **Zbývá ověřit proti reálné Pohodě** a získat reálné odpovědi jako fixtures (anonymizovat před commitem, nahradit `Fixtures/Synthetic`); body k ověření viz krok 2.
 4. Teprve pak `Core/Filing`, `Core/Mdb` a Blazor `serve`.

@@ -14,4 +14,8 @@
     <ProjectReference Include="..\NaPohodu.Core\NaPohodu.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="NaPohodu.Tests" />
+  </ItemGroup>
+
 </Project>

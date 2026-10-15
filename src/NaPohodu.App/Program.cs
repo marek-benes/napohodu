@@ -1,7 +1,8 @@
-using System.CommandLine;
+using System.Text;
+using NaPohodu.App.Cli;
 
-var root = new RootCommand("NaPohodu: doplňková aplikace k účetnímu systému POHODA.");
+// Čeština v konzoli Windows (výchozí OEM 852) i při přesměrování do souboru.
+Console.OutputEncoding = Encoding.UTF8;
 
-// Podpříkazy (customers, invoices, serve, …) přibudou v dalších krocích.
-
+var root = NapohoduCli.Create(CliServices.CreateDefault());
 return await root.Parse(args).InvokeAsync();

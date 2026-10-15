@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\NaPohodu.Core\NaPohodu.Core.csproj" />
+    <ProjectReference Include="..\..\src\NaPohodu.App\NaPohodu.App.csproj" />
   </ItemGroup>
 
   <ItemGroup>

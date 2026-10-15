@@ -129,4 +129,6 @@ dotnet publish src/NaPohodu.App -c Release -o publish
 - `global.json` drží SDK 10.0.x a zapíná pro `dotnet test` Microsoft.Testing.Platform (xunit v3 jinak na .NET 10 SDK neběží).
 - `Directory.Build.props`: `net10.0`, `win-x86`, nullable, warnings as errors, analyzéry `latest-recommended`. Verze balíčků centrálně v `Directory.Packages.props`.
 - `nuget.config` v repozitáři nastavuje nuget.org (nespoléhat na globální konfiguraci stroje).
+- CLI (`src/NaPohodu.App/Cli`): `napohodu customers [--year] [--search]`, `napohodu invoices -c <dataFile> [--from --to RRRR-MM-DD] [--ico]`, `napohodu config`. Společné `--verbose` (logy na stderr) a `--save-response <soubor>` (surová odpověď Pohody → podklad pro fixtures, před commitem anonymizovat). Tabulky jdou na stdout, hlášky a logy na stderr. Návratové kódy: 0 OK, 1 chyba Pohody / chybné volby, 2 konfigurace, 64 nesmyslné volby, 130 přerušeno.
+- Pro `dotnet run` patří lokální konfigurace do `src/NaPohodu.App/appsettings.Local.json` (Web SDK ji zkopíruje vedle exe; je v `.gitignore`).
 - Konfigurace aplikace: `appsettings.json` (v gitu, bez tajných údajů) → `appsettings.Local.json` vedle exe (mimo git, vzor `appsettings.Local.example.json`) → proměnné prostředí `NAPOHODU_*` (např. `NAPOHODU_Pohoda__Password`). Sekce `Pohoda` = `PohodaOptions`.
