@@ -1,0 +1,77 @@
+# HANDOFF — stav k 2026-10-15
+
+Předání kontextu z analýzy první generace (Electron) do nového repozitáře. Při pokračování na jiném stroji začni tímto souborem a `CLAUDE.md`.
+
+## Kde jsme
+
+- Repozitář `napohodu-electron` = první generace (Electron 42, React, TypeScript, PowerShell most do MDB). Funguje v provozu, zůstává bez větších zásahů do dokončení migrace.
+- Tento repozitář = druhá generace v .NET. Zatím obsahuje jen dokumentaci (`docs/pohoda/`), `CLAUDE.md` a tento soubor. Žádný kód.
+- Vývoj se přesouvá na Windows s nainstalovanou Pohodou (lze testovat reálně).
+
+## Rozhodnutí (schválená uživatelem)
+
+| Téma | Rozhodnutí |
+|---|---|
+| Stack | .NET (C#) pro vše: Core + CLI + Blazor web v jednom exe s podpříkazy. Ne WinForms, ne Electron, ne Node. |
+| Architektura | `src/NaPohodu.Core`, `src/NaPohodu.App`, `tests/NaPohodu.Tests`. Co nejméně částí, jeden jazyk. |
+| Build | `win-x86` kvůli Jet OLEDB (dáno Pohodou). |
+| Edice Pohody | POHODA Komplet (MDB). Jet most je správná cesta k zápisu `DocDirs`. |
+| Kód | Nový repozitář (tento), ne větev. Electron verze archivovat po migraci. |
+| Hostovaná část / inbox | Zatím mimo rozsah, možná samostatná aplikace. |
+| AI analýza faktur | Později. |
+| Provoz | PC účetní trvale zapnuté. Plánované úlohy smí propadnout, vše musí jít spustit ručně z CLI. |
+| mServer | Nepoužívat (instance na jednotku, blokuje zálohy). |
+
+## Plán rozšíření (od uživatele)
+
+1. Automatizace spouštěné z CLI (Task Scheduler).
+2. Automatický sběr faktur z e-mailu / adresáře, analýza AI, export do Pohody včetně souboru v Dokumentech firmy.
+3. Automatický import přejmenovaných souborů s fakturami.
+4. Reporty pro zákazníky.
+5. Webový klient; později možný inbox pro výměnu souborů mezi klienty a účetní.
+
+## Co přenést z první generace (funkčně)
+
+Mapování modulů `napohodu-electron/src` → nová generace:
+
+| Původní | Co dělá | Cíl |
+|---|---|---|
+| `main/pohoda/xmlApi.ts` | spuštění `Pohoda.exe /XML`, INI, dekódování odpovědi | `Core/Pohoda/PohodaXmlRunner` |
+| `main/pohoda/xmlHelpers.ts` | obálka DataPack, namespaces, kontrola `state`, `rdc:parts` | `Core/Pohoda/DataPack*`, `ResponsePack*` |
+| `main/pohoda/PohodaClient.ts` | seznam jednotek, export přijatých faktur, parsování na modely | `Core/Pohoda/PohodaClient` + parsery |
+| `shared/models/*.ts` | `Customer`, `Invoice` a podtypy mapované na XSD | `Core/Models` (zachovat mapování na XSD, zjednodušit na to, co UI používá) |
+| `main/filing/fileFiling.ts` | párování souborů, cílové cesty, přesun s kolizemi | `Core/Filing` |
+| `main/filing/fileExport.ts` | export souborů pro kontrolu podle období | `Core/Filing/AuditExport` |
+| `main/mdb/adoBridge.ts` + `markDocs.ts` | čtení FA/DocDirs, plán, zápis v transakci se zálohou | `Core/Mdb` přes `System.Data.OleDb` |
+| `renderer/views/*` | obrazovky: výběr zákazníka, dashboard, zatřídění, export pro kontrolu, dialog poznačení | Blazor stránky, stejné toky a české texty |
+| `main/pohoda/config.ts` | JSON konfigurace v userData (`documentsPath`, `dataPath`, `exePath`, `username`, `password`) | `appsettings` + lokální soubor mimo repo; heslo nikdy do gitu |
+
+## Chyby první generace, které v nové nesmí být
+
+1. Odvození složky firmy ořezávalo běžná jména (regexy bez oddělovače před právní formou). Řešení: `companyDocumentsFolder` z exportu, heuristika jen jako fallback.
+2. Prefix adresáře = první 4 znaky čísla. Řešení: `number/ids` nebo `subFolder` z exportu.
+3. Celá XML odpověď logovaná na INFO bez rotace (osobní údaje, MB na volání).
+4. Žádný timeout při spouštění Pohody a PowerShellu.
+5. Dočasné adresáře podle `Date.now()` (souběh). V .NET `Path.GetTempFileName`/`Directory.CreateTempSubdirectory`.
+6. Zálohy MDB hromaděné v datové složce Pohody bez úklidu.
+7. Přihlašovací údaje commitnuté v `deploy/napohodu-config.json`.
+8. Export pro kontrolu kopíroval ploše, kolize názvů možná u souborů přidaných ručně v Pohodě.
+9. Faktury exportované z Pohody při každém otevření obrazovky (pomalé). Cache per zákazník s ručním obnovením.
+10. Žádné testy. Čisté funkce (párování, cesty, součty, parsery) pokrýt xUnit s fixture z reálných odpovědí.
+
+## Otevřené otázky (ověřit na Windows nebo s uživatelem)
+
+- Vrací export s `attachments=true` `companyDocumentsFolder` u každé faktury, nebo jen u faktur s dokumenty? Potřeba kvůli zákazníkům bez jediného zatříděného souboru.
+- Proč mají přijaté faktury prefixovou úroveň a vydané plochou? Je prostřední úroveň prefix číselné řady a může mít jinou délku než 4 znaky?
+- Mají se zatřiďovat i přijaté dobropisy a zálohové faktury (jiný `RelTpFak`, jiný `invoiceType`)?
+- Má zatřídění hledat faktury ve všech ročnících firmy, nebo jen ve vybraném?
+- Má účetní při zatřiďování Pohodu zavřenou? Automatické poznačení po přesunu to vyžaduje.
+- Co má obsahovat „Export pro zákazníka“ (v 1. generaci jen placeholder)?
+- Kolik uživatelů a stanic, jak se distribuuje exe.
+
+## Navržený první krok
+
+1. Založit řešení (`dotnet new sln`, Core/App/Tests), `Directory.Build.props` s `RuntimeIdentifier=win-x86`, `.editorconfig`, nullable + warnings as errors.
+2. `Core/Pohoda`: runner (`Pohoda.exe /XML` s timeoutem, INI, dekódování windows-1250), DataPack obálka, kontrola `state`, parser `listAccountingUnit` a `listInvoice` (přijaté, s `attachments=true`).
+3. `App`: CLI `napohodu customers` a `napohodu invoices --customer <dataFile> [--from --to]` s tabulkovým výstupem. Tím se ověří komunikace na Windows a získají reálné odpovědi jako fixtures (anonymizovat před commitem).
+4. Teprve pak `Core/Filing`, `Core/Mdb` a Blazor `serve`.
