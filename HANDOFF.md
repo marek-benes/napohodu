@@ -71,7 +71,7 @@ Mapování modulů `napohodu-electron/src` → nová generace:
 
 ## Navržený první krok
 
-1. Založit řešení (`dotnet new sln`, Core/App/Tests), `Directory.Build.props` s `RuntimeIdentifier=win-x86`, `.editorconfig`, nullable + warnings as errors.
+1. ~~Založit řešení (`dotnet new sln`, Core/App/Tests), `Directory.Build.props` s `RuntimeIdentifier=win-x86`, `.editorconfig`, nullable + warnings as errors.~~ Hotovo 2026-10-15: .NET 10, `NaPohodu.slnx`, xunit v3 na Microsoft.Testing.Platform, `PohodaOptions` + vrstvená konfigurace, `napohodu --help/--version`.
 2. `Core/Pohoda`: runner (`Pohoda.exe /XML` s timeoutem, INI, dekódování windows-1250), DataPack obálka, kontrola `state`, parser `listAccountingUnit` a `listInvoice` (přijaté, s `attachments=true`).
 3. `App`: CLI `napohodu customers` a `napohodu invoices --customer <dataFile> [--from --to]` s tabulkovým výstupem. Tím se ověří komunikace na Windows a získají reálné odpovědi jako fixtures (anonymizovat před commitem).
 4. Teprve pak `Core/Filing`, `Core/Mdb` a Blazor `serve`.

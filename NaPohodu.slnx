@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/NaPohodu.App/NaPohodu.App.csproj" />
+    <Project Path="src/NaPohodu.Core/NaPohodu.Core.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/NaPohodu.Tests/NaPohodu.Tests.csproj" />
+  </Folder>
+</Solution>

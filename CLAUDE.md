@@ -27,14 +27,14 @@ Toto je **druhá generace** aplikace. První generace (Electron + TypeScript) je
 
 ## Technologický stack (cílový)
 
-- **.NET 8+, C#**, jeden jazyk pro vše. Žádný Node, žádný PowerShell most.
+- **.NET 10 (LTS), C#**, jeden jazyk pro vše. Žádný Node, žádný PowerShell most.
 - **Build `win-x86`**: Jet 4.0 OLEDB provider (přístup k MDB) existuje jen 32bit. Je to dané Pohodou.
 - **Jeden spustitelný soubor s podpříkazy** (`napohodu serve`, `napohodu filing …`, `napohodu collect …`). CLI slouží Task Scheduleru, `serve` spouští webové UI.
 - **Web UI: ASP.NET Core + Blazor** (Razor komponenty, C#). Ne WinForms. Styling bez Node toolchainu (CSS framework z CDN nebo Tailwind standalone).
 - **Struktura řešení**
 
 ```
-NaPohodu.sln
+NaPohodu.slnx
   src/NaPohodu.Core     doménové modely, Pohoda XML (export/import), MDB (DocDirs), zatřídění souborů,
                         později e-mail (MailKit), AI analýza, reporty
   src/NaPohodu.App      jeden exe: CLI (System.CommandLine) + `serve` (ASP.NET Core/Blazor)
@@ -113,4 +113,20 @@ docs/pohoda/import_faktury_vcetne_zalozky_dokumenty.xml  ukázka importu faktury
 HANDOFF.md                stav migrace, rozhodnutí, plán, otevřené otázky
 ```
 
-Vývojové příkazy doplnit, jakmile vznikne řešení (`dotnet build`, `dotnet test`, `dotnet publish -r win-x86`).
+---
+
+## Vývoj
+
+Předpoklady: .NET 10 SDK (x64) a **x86** runtime .NET + ASP.NET Core 10 (`C:\Program Files (x86)\dotnet`). Aplikace i testy běží jako x86 proces kvůli Jet OLEDB.
+
+```
+dotnet build NaPohodu.slnx
+dotnet test --solution NaPohodu.slnx
+dotnet run --project src/NaPohodu.App -- --help
+dotnet publish src/NaPohodu.App -c Release -o publish
+```
+
+- `global.json` drží SDK 10.0.x a zapíná pro `dotnet test` Microsoft.Testing.Platform (xunit v3 jinak na .NET 10 SDK neběží).
+- `Directory.Build.props`: `net10.0`, `win-x86`, nullable, warnings as errors, analyzéry `latest-recommended`. Verze balíčků centrálně v `Directory.Packages.props`.
+- `nuget.config` v repozitáři nastavuje nuget.org (nespoléhat na globální konfiguraci stroje).
+- Konfigurace aplikace: `appsettings.json` (v gitu, bez tajných údajů) → `appsettings.Local.json` vedle exe (mimo git, vzor `appsettings.Local.example.json`) → proměnné prostředí `NAPOHODU_*` (např. `NAPOHODU_Pohoda__Password`). Sekce `Pohoda` = `PohodaOptions`.
