@@ -43,7 +43,7 @@ public class InvoiceParserTests
         var documents = Invoices()[0].Documents;
 
         Assert.NotNull(documents);
-        Assert.Equal("Žluťoučký kůň", documents.CompanyDocumentsFolder);
+        Assert.Equal(@"C:\ProgramData\STORMWARE\POHODA\Dokumenty\Žluťoučký kůň\", documents.CompanyDocumentsFolder);
         Assert.Equal(@"Fakturace\Přijaté faktury\2611\26110009", documents.SubFolder);
         Assert.Equal(["26110009.pdf", "26110009_dodaci_list.pdf"], documents.Files);
     }

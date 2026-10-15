@@ -56,7 +56,7 @@ public sealed class CliTests : IDisposable
         Assert.Contains(@"Fakturace\Přijaté faktury\2611\26110009", text, StringComparison.Ordinal);
         Assert.Contains("EUR", text, StringComparison.Ordinal);
         Assert.Contains("Celkem 2 faktur.", text, StringComparison.Ordinal);
-        Assert.Contains("Složka firmy v Dokumentech: Žluťoučký kůň", text, StringComparison.Ordinal);
+        Assert.Contains(@"Složka firmy v Dokumentech: C:\ProgramData\STORMWARE\POHODA\Dokumenty\Žluťoučký kůň\", text, StringComparison.Ordinal);
         Assert.Contains("Bez složky firmy: 1, bez podsložky dokladu: 1.", text, StringComparison.Ordinal);
     }
 

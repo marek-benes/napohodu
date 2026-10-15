@@ -59,11 +59,16 @@ public sealed record Invoice
 public sealed record ForeignAmount(string Currency, decimal Total);
 
 /// <summary>
-/// Záložka Dokumenty faktury. <see cref="CompanyDocumentsFolder"/> je složka firmy (jen export),
-/// <see cref="SubFolder"/> adresář dokladu relativně k ní (např. <c>Fakturace\Přijaté faktury\2611\26110009</c>).
+/// Záložka Dokumenty faktury. Pohoda ji posílá jen u faktur, které nějaký dokument mají.
+/// <see cref="SubFolder"/> je adresář dokladu relativně ke složce firmy
+/// (např. <c>Fakturace\Přijaté faktury\2511\251100002</c>, výjimečně plochý <c>…\Přijaté faktury\251100001</c>).
 /// </summary>
 public sealed record InvoiceDocuments
 {
+    /// <summary>
+    /// Absolutní cesta ke složce firmy v Dokumentech včetně koncového <c>\</c>
+    /// (např. <c>C:\ProgramData\STORMWARE\POHODA\Dokumenty\SafetyLine\</c>).
+    /// </summary>
     public string? CompanyDocumentsFolder { get; init; }
 
     public string? SubFolder { get; init; }

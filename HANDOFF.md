@@ -61,8 +61,8 @@ Mapování modulů `napohodu-electron/src` → nová generace:
 
 ## Otevřené otázky (ověřit na Windows nebo s uživatelem)
 
-- Vrací export s `attachments=true` `companyDocumentsFolder` u každé faktury, nebo jen u faktur s dokumenty? Potřeba kvůli zákazníkům bez jediného zatříděného souboru.
-- Proč mají přijaté faktury prefixovou úroveň a vydané plochou? Je prostřední úroveň prefix číselné řady a může mít jinou délku než 4 znaky?
+- ~~Vrací export s `attachments=true` `companyDocumentsFolder` u každé faktury, nebo jen u faktur s dokumenty?~~ **Ověřeno 2026-10-15: jen u faktur s dokumenty** (SafetyLine 2025: 36 z 484). Firma bez jediného zatříděného souboru složku z exportu nedostane → **otevřené: odkud ji vzít** (heuristika z názvu + ověření existence, ruční nastavení per zákazník, nebo jiný ročník téže firmy).
+- Proč mají přijaté faktury prefixovou úroveň a vydané plochou? **Částečně:** u přijatých jsou v jedné jednotce obě podoby (`Fakturace\Přijaté faktury\2511\251100002` i plochá `Fakturace\Přijaté faktury\251100001`), takže tvar určuje to, kdo/jak soubor zatřídil, ne pevné pravidlo. Prostřední úroveň odpovídá `number/ids` (`2511`). Zbývá: jaký tvar má NaPohodu vytvářet pro nové zatřídění (návrh: `<ids>\<číslo>`, jak to dělá většina).
 - Mají se zatřiďovat i přijaté dobropisy a zálohové faktury (jiný `RelTpFak`, jiný `invoiceType`)?
 - Má zatřídění hledat faktury ve všech ročnících firmy, nebo jen ve vybraném?
 - Má účetní při zatřiďování Pohodu zavřenou? Automatické poznačení po přesunu to vyžaduje.
@@ -77,6 +77,8 @@ Mapování modulů `napohodu-electron/src` → nová generace:
    - zda `Pohoda.exe` vrací chybové kódy 1xx/5xx jako návratový kód procesu, nebo jen v odpovědi. **Částečně:** odmítnutý balíček vrátí kód 0 a `responsePack state="error"` s `note`.
    - ~~zda export faktur projde bez `ico`~~ **Ověřeno 2026-10-15: neprojde** („Tento balíček není určen pro tuto jednotku.“, odpověď nese `ico` a `key` otevřené jednotky). Požadavky nad jednotkou proto vyžadují `UnitIdentity` (IČ, jinak `key`); CLI bez `--ico` dohledá jednotku přes `listAccountingUnit`.
    - `acu:dataFile` vrací název **včetně přípony** (`08215839_2026.mdb`) a ten se předává jako `database` v INI. `acu:id` Pohoda neposílá. Seznam 83 jednotek trval 4,7 s, odpověď 93 kB.
-   - skutečný tvar `number/ids`, `companyDocumentsFolder` a `subFolder` (viz otevřené otázky).
-3. ~~`App`: CLI `napohodu customers` a `napohodu invoices --customer <dataFile> [--from --to]` s tabulkovým výstupem.~~ Hotovo 2026-10-15 (+ `napohodu config`, `--save-response`). **Zbývá ověřit proti reálné Pohodě** a získat reálné odpovědi jako fixtures (anonymizovat před commitem, nahradit `Fixtures/Synthetic`); body k ověření viz krok 2.
+   - **Ověřeno 2026-10-15 (SafetyLine 2025, 484 faktur, 2 MB):** `attachments=true` funguje. `companyDocumentsFolder` je **absolutní cesta** včetně `documentsPath` a koncového `\` (`C:\ProgramData\STORMWARE\POHODA\Dokumenty\SafetyLine\`), ne jen název složky. `subFolder` je relativní k ní. Soubory v Dokumentech se nemusí jmenovat podle čísla (`k251100002.pdf`, `Sken ze dne … (přetaženo).pdf`), párování tedy nesmí předpokládat název = číslo u existujících záznamů.
+   - `number/ids` (prefix řady, např. `2511`) Pohoda vrací u faktur z řady daného roku; u faktur z řady předchozího roku, které jsou v ročníku také (2024 v souboru 2025, 2025 v souboru 2026), `ids` **chybí**. Prefix pro cestu proto nelze brát jen z `ids`.
+   - Ročník obsahuje i faktury s datem z předchozího roku (24 faktur z 12/2024 v souboru 2025).
+3. ~~`App`: CLI `napohodu customers` a `napohodu invoices --customer <dataFile> [--from --to]` s tabulkovým výstupem.~~ Hotovo 2026-10-15 (+ `napohodu config`, `--save-response`). **Ověřeno proti reálné Pohodě** (seznam jednotek, faktury SafetyLine 2025/2026). Zbývá: z uložených odpovědí (`tmp/`, mimo git) udělat anonymizované fixtures a nahradit `Fixtures/Synthetic`.
 4. Teprve pak `Core/Filing`, `Core/Mdb` a Blazor `serve`.
