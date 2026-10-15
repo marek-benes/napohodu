@@ -123,6 +123,55 @@ public sealed class CliTests : IDisposable
     }
 
     [Fact]
+    public async Task Filing_PreviewDoesNotMoveAndApplyMoves()
+    {
+        using var temp = new Filing.TempDirectory();
+        var source = temp.Dir("zdroj");
+        var company = temp.Dir("Firma");
+        temp.File("nová", "zdroj", "251100038.pdf");
+        temp.File("x", "zdroj", "neznámý.pdf");
+        string[] args = ["filing", "-c", RealFixtures.UnitDataFile2025, "--source", source, "--company-folder", company];
+
+        var preview = await Run(args);
+
+        Assert.Equal(PohodaCommandRunner.Ok, preview);
+        Assert.True(File.Exists(Path.Combine(source, "251100038.pdf")));
+        var text = _output.ToString();
+        Assert.Contains(@"Fakturace\Přijaté faktury\2511\251100038", text, StringComparison.Ordinal);
+        Assert.Contains("Spárováno 1: připraveno 1", text, StringComparison.Ordinal);
+        Assert.Contains("Nespárováno 1", text, StringComparison.Ordinal);
+        Assert.Contains("Náhled – nic se nepřesunulo.", text, StringComparison.Ordinal);
+
+        var apply = await Run([.. args, "--apply"]);
+
+        Assert.Equal(PohodaCommandRunner.Ok, apply);
+        Assert.True(File.Exists(Path.Combine(company, "Fakturace", "Přijaté faktury", "2511", "251100038", "251100038.pdf")));
+        Assert.False(File.Exists(Path.Combine(source, "251100038.pdf")));
+        Assert.Contains("Přesunuto 1, přeskočeno 0, chyb 0.", _output.ToString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task Filing_UsesCompanyFolderFromExport()
+    {
+        using var temp = new Filing.TempDirectory();
+        var source = temp.Dir("zdroj");
+
+        var exitCode = await Run("filing", "-c", RealFixtures.UnitDataFile2025, "--source", source);
+
+        Assert.Equal(PohodaCommandRunner.Ok, exitCode);
+        Assert.Contains($"Složka firmy: {RealFixtures.CompanyDocumentsFolder.TrimEnd('\\')} – export faktur", _output.ToString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task Filing_MissingSource_IsRejectedWithoutRunningPohoda()
+    {
+        var exitCode = await Run("filing", "-c", RealFixtures.UnitDataFile2025, "--source", @"C:\neexistuje\nikde");
+
+        Assert.Equal(PohodaCommandRunner.InvalidArguments, exitCode);
+        Assert.False(_runner.WasCalled);
+    }
+
+    [Fact]
     public async Task Invoices_WithoutCustomer_IsParseError()
     {
         var exitCode = await Run("invoices");
