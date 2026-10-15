@@ -26,60 +26,74 @@ public sealed class CliTests : IDisposable
 
         Assert.Equal(PohodaCommandRunner.Ok, exitCode);
         var text = _output.ToString();
-        Assert.Contains("StwPh_12345678_2026", text, StringComparison.Ordinal);
-        Assert.Contains("Žluťoučký kůň s.r.o.", text, StringComparison.Ordinal);
+        Assert.Contains(RealFixtures.UnitDataFile2025, text, StringComparison.Ordinal);
+        Assert.Contains("Firma Šťastná 011", text, StringComparison.Ordinal);
         Assert.Contains("daňová evidence", text, StringComparison.Ordinal);
-        Assert.Contains("Celkem 2 jednotek.", text, StringComparison.Ordinal);
+        Assert.Contains("podvojné (nezisková)", text, StringComparison.Ordinal);
+        Assert.Contains("Celkem 83 jednotek.", text, StringComparison.Ordinal);
         Assert.Null(Assert.Single(_runner.Calls).Database);
     }
 
     [Fact]
     public async Task Customers_FiltersByYearAndSearch()
     {
-        var exitCode = await Run("customers", "--year", "2025", "--search", "dvořák");
+        var exitCode = await Run("customers", "--year", "2025", "--search", "šťastná 011");
 
         Assert.Equal(PohodaCommandRunner.Ok, exitCode);
         var text = _output.ToString();
-        Assert.Contains("StwPh_87654321_2025", text, StringComparison.Ordinal);
-        Assert.DoesNotContain("StwPh_12345678_2026", text, StringComparison.Ordinal);
-        Assert.Contains("Zobrazeno 1 z 2 jednotek.", text, StringComparison.Ordinal);
+        Assert.Contains(RealFixtures.UnitDataFile2025, text, StringComparison.Ordinal);
+        Assert.DoesNotContain("90000010_2026.mdb", text, StringComparison.Ordinal);
+        Assert.Contains("Zobrazeno 1 z 83 jednotek.", text, StringComparison.Ordinal);
     }
 
     [Fact]
     public async Task Invoices_PrintsTableAndDocumentsSummary()
     {
-        var exitCode = await Run("invoices", "--customer", "StwPh_12345678_2026", "--from", "2026-01-01", "--to", "2026-03-31");
+        var exitCode = await Run("invoices", "--customer", RealFixtures.UnitDataFile2025, "--from", "2025-01-01", "--to", "2025-12-31");
 
         Assert.Equal(PohodaCommandRunner.Ok, exitCode);
         var text = _output.ToString();
-        Assert.Contains("26110009", text, StringComparison.Ordinal);
-        Assert.Contains(@"Fakturace\Přijaté faktury\2611\26110009", text, StringComparison.Ordinal);
+        Assert.Contains("251100002", text, StringComparison.Ordinal);
+        Assert.Contains(@"Fakturace\Přijaté faktury\2511\251100002", text, StringComparison.Ordinal);
+        Assert.Contains(@"Fakturace\Přijaté faktury\251100001", text, StringComparison.Ordinal);
         Assert.Contains("EUR", text, StringComparison.Ordinal);
-        Assert.Contains("Celkem 2 faktur.", text, StringComparison.Ordinal);
-        Assert.Contains(@"Složka firmy v Dokumentech: C:\ProgramData\STORMWARE\POHODA\Dokumenty\Žluťoučký kůň\", text, StringComparison.Ordinal);
-        Assert.Contains("Bez složky firmy: 1, bez podsložky dokladu: 1.", text, StringComparison.Ordinal);
+        Assert.Contains("Celkem 53 faktur.", text, StringComparison.Ordinal);
+        Assert.Contains($"Složka firmy v Dokumentech: {RealFixtures.CompanyDocumentsFolder}", text, StringComparison.Ordinal);
+        Assert.Contains("Bez složky firmy: 17, bez podsložky dokladu: 17.", text, StringComparison.Ordinal);
     }
 
     [Fact]
     public async Task Invoices_WithoutIco_ResolvesUnitFirst()
     {
-        var exitCode = await Run("invoices", "-c", "StwPh_12345678_2026");
+        // Bez přípony .mdb, jak ji uživatel nejspíš napíše.
+        var exitCode = await Run("invoices", "-c", "90000010_2025");
 
         Assert.Equal(PohodaCommandRunner.Ok, exitCode);
         Assert.Collection(
             _runner.Calls,
             acu => Assert.Equal((null, null), (acu.Database, acu.Ico)),
-            inv => Assert.Equal(("StwPh_12345678_2026", "12345678"), (inv.Database, inv.Ico)));
+            inv => Assert.Equal((RealFixtures.UnitDataFile2025, RealFixtures.UnitIco), (inv.Database, inv.Ico)));
     }
 
     [Fact]
     public async Task Invoices_WithIco_SkipsUnitLookup()
     {
-        var exitCode = await Run("invoices", "-c", "StwPh_12345678_2026", "--ico", "12345678");
+        var exitCode = await Run("invoices", "-c", RealFixtures.UnitDataFile2025, "--ico", RealFixtures.UnitIco);
 
         Assert.Equal(PohodaCommandRunner.Ok, exitCode);
         var call = Assert.Single(_runner.Calls);
-        Assert.Equal(("StwPh_12345678_2026", "12345678"), (call.Database, call.Ico));
+        Assert.Equal((RealFixtures.UnitDataFile2025, RealFixtures.UnitIco), (call.Database, call.Ico));
+    }
+
+    [Fact]
+    public async Task Invoices_RejectedByPohoda_ReturnsErrorWithNote()
+    {
+        _runner.InvoiceFixture = RealFixtures.ErrorNotForThisUnit;
+
+        var exitCode = await Run("invoices", "-c", RealFixtures.UnitDataFile2025, "--ico", RealFixtures.UnitIco);
+
+        Assert.Equal(PohodaCommandRunner.PohodaError, exitCode);
+        Assert.Contains("Tento balíček není určen pro tuto jednotku.", _error.ToString(), StringComparison.Ordinal);
     }
 
     [Fact]
@@ -97,10 +111,10 @@ public sealed class CliTests : IDisposable
         var path = Path.Combine(Path.GetTempPath(), $"napohodu-{Guid.NewGuid():N}.xml");
         try
         {
-            var exitCode = await Run("invoices", "-c", "X", "--ico", "12345678", "--save-response", path);
+            var exitCode = await Run("invoices", "-c", "X", "--ico", RealFixtures.UnitIco, "--save-response", path);
 
             Assert.Equal(PohodaCommandRunner.Ok, exitCode);
-            Assert.Equal(FixtureFiles.ReadBytes("Synthetic/listInvoice.received.response.xml"), await File.ReadAllBytesAsync(path, TestContext.Current.CancellationToken));
+            Assert.Equal(FixtureFiles.ReadBytes(RealFixtures.ReceivedInvoices2025), await File.ReadAllBytesAsync(path, TestContext.Current.CancellationToken));
         }
         finally
         {
@@ -188,6 +202,8 @@ public sealed class CliTests : IDisposable
     {
         public PohodaException? Error { get; set; }
 
+        public string InvoiceFixture { get; set; } = RealFixtures.ReceivedInvoices2025;
+
         public List<(string? Database, string? Ico)> Calls { get; } = [];
 
         public bool WasCalled => Calls.Count > 0;
@@ -201,9 +217,7 @@ public sealed class CliTests : IDisposable
             }
 
             var isUnitList = request.Descendants(PohodaNamespaces.Acu + "listAccountingUnitRequest").Any();
-            var bytes = FixtureFiles.ReadBytes(isUnitList
-                ? "Synthetic/listAccountingUnit.response.xml"
-                : "Synthetic/listInvoice.received.response.xml");
+            var bytes = FixtureFiles.ReadBytes(isUnitList ? RealFixtures.AccountingUnits : InvoiceFixture);
             return Task.FromResult(new PohodaXmlResponse(PohodaXmlRunner.ParseResponse(bytes), bytes));
         }
     }

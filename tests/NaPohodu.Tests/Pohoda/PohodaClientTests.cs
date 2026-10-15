@@ -15,7 +15,7 @@ public class PohodaClientTests
 
         var units = await new PohodaClient(runner).GetAccountingUnitsAsync(TestContext.Current.CancellationToken);
 
-        Assert.Equal(2, units.Count);
+        Assert.Equal(83, units.Count);
         var call = Assert.Single(runner.Calls);
         Assert.Null(call.Database);
         Assert.Equal(Acu + "listAccountingUnitRequest", call.ContentName);
@@ -28,27 +28,28 @@ public class PohodaClientTests
         var runner = new FakeRunner();
 
         var invoices = await new PohodaClient(runner).GetReceivedInvoicesAsync(
-            "StwPh_12345678_2026",
-            new UnitIdentity("12345678", key: null),
+            RealFixtures.UnitDataFile2025,
+            new UnitIdentity(RealFixtures.UnitIco, key: null),
             cancellationToken: TestContext.Current.CancellationToken);
 
-        Assert.Equal(2, invoices.Count);
+        Assert.Equal(53, invoices.Count);
         var call = Assert.Single(runner.Calls);
-        Assert.Equal("StwPh_12345678_2026", call.Database);
+        Assert.Equal(RealFixtures.UnitDataFile2025, call.Database);
         Assert.Equal(Lst + "listInvoiceRequest", call.ContentName);
-        Assert.Equal("12345678", call.Ico);
+        Assert.Equal(RealFixtures.UnitIco, call.Ico);
     }
 
     [Theory]
-    [InlineData("StwPh_87654321_2025")]
-    [InlineData("stwph_87654321_2025.MDB")]
+    [InlineData("90000010_2025")]
+    [InlineData(" 90000010_2025.MDB ")]
     public async Task FindAccountingUnit_MatchesDataFileWithOrWithoutExtension(string requested)
     {
         var runner = new FakeRunner();
 
         var unit = await new PohodaClient(runner).FindAccountingUnitAsync(requested, TestContext.Current.CancellationToken);
 
-        Assert.Equal("87654321", unit.Ico);
+        Assert.Equal(RealFixtures.UnitIco, unit.Ico);
+        Assert.Equal(2025, unit.Year);
     }
 
     [Fact]
@@ -87,7 +88,7 @@ public class PohodaClientTests
     {
         public List<(string? Database, XName ContentName, string? Ico)> Calls { get; } = [];
 
-        public string InvoiceFixture { get; init; } = "Synthetic/listInvoice.received.response.xml";
+        public string InvoiceFixture { get; init; } = RealFixtures.ReceivedInvoices2025;
 
         public Task<PohodaXmlResponse> RunAsync(XDocument request, string? database, CancellationToken cancellationToken = default)
         {
@@ -95,7 +96,7 @@ public class PohodaClientTests
             Calls.Add((database, contentName, request.Root.Attribute("ico")?.Value));
 
             var fixture = contentName == Acu + "listAccountingUnitRequest"
-                ? "Synthetic/listAccountingUnit.response.xml"
+                ? RealFixtures.AccountingUnits
                 : InvoiceFixture;
             var bytes = FixtureFiles.ReadBytes(fixture);
             return Task.FromResult(new PohodaXmlResponse(PohodaXmlRunner.ParseResponse(bytes), bytes));

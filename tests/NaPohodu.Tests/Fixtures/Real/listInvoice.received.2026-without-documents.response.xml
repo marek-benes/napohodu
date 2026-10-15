@@ -1,0 +1,1624 @@
+<?xml version="1.0" encoding="windows-1250"?>
+<!-- Anonymizovaná reálná odpověď Pohody (tools/anonymize-fixture.cs); vzorek 16 z 248 faktur. --><rsp:responsePack version="2.0" id="inv" state="ok" programVersion="14400.171 (8.10.2026)" ico="90000010" key="00000000-0000-4000-8000-000000000010" note="Export přijatých faktur" xmlns:rsp="http://www.stormware.cz/schema/version_2/response.xsd" xmlns:rdc="http://www.stormware.cz/schema/version_2/documentresponse.xsd" xmlns:typ="http://www.stormware.cz/schema/version_2/type.xsd" xmlns:ftr="http://www.stormware.cz/schema/version_2/filter.xsd" xmlns:lst="http://www.stormware.cz/schema/version_2/list.xsd" xmlns:inv="http://www.stormware.cz/schema/version_2/invoice.xsd">
+	<rsp:responsePackItem version="2.0" id="inv" state="ok">
+		<lst:listInvoice version="2.0" dateTimeStamp="2026-10-15T21:03:38" dateValidFrom="2026-10-15" state="ok">
+			<lst:invoice version="2.0">
+				<inv:invoiceHeader>
+					<inv:id>4940</inv:id>
+					<inv:invoiceType>receivedInvoice</inv:invoiceType>
+					<inv:number>
+						<typ:id>383</typ:id>
+						<typ:numberRequested>251100284</typ:numberRequested>
+					</inv:number>
+					<inv:symVar>90000053</inv:symVar>
+					<inv:originalDocument>DOD00054</inv:originalDocument>
+					<inv:date>2025-08-21</inv:date>
+					<inv:dateTax>2025-08-21</inv:dateTax>
+					<inv:dateAccounting>2025-08-21</inv:dateAccounting>
+					<inv:dateDue>2025-09-04</inv:dateDue>
+					<inv:accounting>
+						<typ:id>381</typ:id>
+						<typ:ids>BEZ321002</typ:ids>
+					</inv:accounting>
+					<inv:classificationVAT>
+						<typ:id>14</typ:id>
+						<typ:ids>PN</typ:ids>
+						<typ:classificationVATType>nonSubsume</typ:classificationVATType>
+					</inv:classificationVAT>
+					<inv:text>Popis dokladu 27</inv:text>
+					<inv:partnerIdentity>
+						<typ:address>
+							<typ:company>Firma Šťastná 051</typ:company>
+							<typ:country>
+								<typ:id>83</typ:id>
+								<typ:ids>IT</typ:ids>
+							</typ:country>
+						</typ:address>
+					</inv:partnerIdentity>
+					<inv:myIdentity>
+						<typ:address>
+							<typ:company>Firma Šťastná 011</typ:company>
+							<typ:city>Město 12</typ:city>
+							<typ:street>Ulice 10</typ:street>
+							<typ:number>9</typ:number>
+							<typ:zip>109 00</typ:zip>
+							<typ:ico>90000010</typ:ico>
+							<typ:dic>CZ90000010</typ:dic>
+							<typ:mobilPhone>600 000 007</typ:mobilPhone>
+							<typ:email>kontakt12@example.cz</typ:email>
+						</typ:address>
+					</inv:myIdentity>
+					<inv:paymentType>
+						<typ:id>1</typ:id>
+						<typ:ids>Příkazem</typ:ids>
+						<typ:paymentType>draft</typ:paymentType>
+					</inv:paymentType>
+					<inv:symConst>0308</inv:symConst>
+					<inv:liquidation>
+						<typ:date>2026-04-30</typ:date>
+					</inv:liquidation>
+					<inv:lock2>false</inv:lock2>
+					<inv:markRecord>false</inv:markRecord>
+				</inv:invoiceHeader>
+				<inv:invoiceSummary>
+					<inv:roundingDocument>none</inv:roundingDocument>
+					<inv:roundingVAT>none</inv:roundingVAT>
+					<inv:typeCalculateVATInclusivePrice>VATNewMethod</inv:typeCalculateVATInclusivePrice>
+					<inv:typeCalculateVATForeignCurrency>localAmount</inv:typeCalculateVATForeignCurrency>
+					<inv:homeCurrency>
+						<typ:priceNone>483.09</typ:priceNone>
+						<typ:priceLow>0</typ:priceLow>
+						<typ:priceLowVAT rate="12">0</typ:priceLowVAT>
+						<typ:priceLowSum>0</typ:priceLowSum>
+						<typ:priceHigh>0</typ:priceHigh>
+						<typ:priceHighVAT rate="21">0</typ:priceHighVAT>
+						<typ:priceHighSum>0</typ:priceHighSum>
+						<typ:round>
+							<typ:priceRound>0</typ:priceRound>
+						</typ:round>
+					</inv:homeCurrency>
+					<inv:foreignCurrency>
+						<typ:currency>
+							<typ:id>9</typ:id>
+							<typ:ids>EUR</typ:ids>
+						</typ:currency>
+						<typ:rate>24.535</typ:rate>
+						<typ:amount>1</typ:amount>
+						<typ:priceSum>19.69</typ:priceSum>
+						<typ:round>
+							<typ:priceRound>0</typ:priceRound>
+						</typ:round>
+					</inv:foreignCurrency>
+				</inv:invoiceSummary>
+			</lst:invoice>
+			<lst:invoice version="2.0">
+				<inv:invoiceHeader>
+					<inv:id>5168</inv:id>
+					<inv:invoiceType>receivedInvoice</inv:invoiceType>
+					<inv:number>
+						<typ:id>383</typ:id>
+						<typ:numberRequested>251100422</typ:numberRequested>
+					</inv:number>
+					<inv:symVar>90000054</inv:symVar>
+					<inv:originalDocument>DOD00055</inv:originalDocument>
+					<inv:date>2025-12-02</inv:date>
+					<inv:dateTax>2025-12-02</inv:dateTax>
+					<inv:dateAccounting>2025-12-02</inv:dateAccounting>
+					<inv:dateDue>2026-01-16</inv:dateDue>
+					<inv:dateKHDPH>2025-12-02</inv:dateKHDPH>
+					<inv:accounting>
+						<typ:id>380</typ:id>
+						<typ:ids>BEZ321001</typ:ids>
+					</inv:accounting>
+					<inv:classificationVAT>
+						<typ:id>211</typ:id>
+						<typ:ids>PD</typ:ids>
+					</inv:classificationVAT>
+					<inv:text>Popis dokladu 35</inv:text>
+					<inv:partnerIdentity>
+						<typ:id>1138</typ:id>
+						<typ:address>
+							<typ:company>Firma Šťastná 052</typ:company>
+							<typ:city>Město 32</typ:city>
+							<typ:street>Ulice 40</typ:street>
+							<typ:zip>130 00</typ:zip>
+							<typ:ico>90000039</typ:ico>
+							<typ:dic>CZ90000039</typ:dic>
+							<typ:country>
+								<typ:id>40</typ:id>
+								<typ:ids>CZ</typ:ids>
+							</typ:country>
+						</typ:address>
+					</inv:partnerIdentity>
+					<inv:myIdentity>
+						<typ:address>
+							<typ:company>Firma Šťastná 011</typ:company>
+							<typ:city>Město 12</typ:city>
+							<typ:street>Ulice 10</typ:street>
+							<typ:number>9</typ:number>
+							<typ:zip>109 00</typ:zip>
+							<typ:ico>90000010</typ:ico>
+							<typ:dic>CZ90000010</typ:dic>
+							<typ:mobilPhone>600 000 007</typ:mobilPhone>
+							<typ:email>kontakt12@example.cz</typ:email>
+						</typ:address>
+					</inv:myIdentity>
+					<inv:paymentType>
+						<typ:id>1</typ:id>
+						<typ:ids>Příkazem</typ:ids>
+						<typ:paymentType>draft</typ:paymentType>
+					</inv:paymentType>
+					<inv:symConst>0308</inv:symConst>
+					<inv:paymentAccount>
+						<typ:accountNo>000000-0000000020</typ:accountNo>
+						<typ:bankCode>0000</typ:bankCode>
+					</inv:paymentAccount>
+					<inv:intNote>Interní poznámka 1</inv:intNote>
+					<inv:liquidation>
+						<typ:date>2026-01-12</typ:date>
+					</inv:liquidation>
+					<inv:lock2>false</inv:lock2>
+					<inv:markRecord>false</inv:markRecord>
+				</inv:invoiceHeader>
+				<inv:invoiceSummary>
+					<inv:roundingDocument>none</inv:roundingDocument>
+					<inv:roundingVAT>none</inv:roundingVAT>
+					<inv:typeCalculateVATInclusivePrice>VATNewMethod</inv:typeCalculateVATInclusivePrice>
+					<inv:typeCalculateVATForeignCurrency>localAmount</inv:typeCalculateVATForeignCurrency>
+					<inv:homeCurrency>
+						<typ:priceNone>0</typ:priceNone>
+						<typ:priceLow>0</typ:priceLow>
+						<typ:priceLowVAT rate="12">0</typ:priceLowVAT>
+						<typ:priceLowSum>0</typ:priceLowSum>
+						<typ:priceHigh>20000</typ:priceHigh>
+						<typ:priceHighVAT rate="21">4200</typ:priceHighVAT>
+						<typ:priceHighSum>24200</typ:priceHighSum>
+						<typ:round>
+							<typ:priceRound>0</typ:priceRound>
+						</typ:round>
+					</inv:homeCurrency>
+				</inv:invoiceSummary>
+			</lst:invoice>
+			<lst:invoice version="2.0">
+				<inv:invoiceHeader>
+					<inv:id>5172</inv:id>
+					<inv:invoiceType>receivedInvoice</inv:invoiceType>
+					<inv:number>
+						<typ:id>383</typ:id>
+						<typ:numberRequested>251100425</typ:numberRequested>
+					</inv:number>
+					<inv:symVar>900000055</inv:symVar>
+					<inv:originalDocument>DOD00056</inv:originalDocument>
+					<inv:date>2025-12-08</inv:date>
+					<inv:dateTax>2025-12-08</inv:dateTax>
+					<inv:dateAccounting>2025-12-08</inv:dateAccounting>
+					<inv:dateDue>2026-01-10</inv:dateDue>
+					<inv:accounting>
+						<typ:id>381</typ:id>
+						<typ:ids>BEZ321002</typ:ids>
+					</inv:accounting>
+					<inv:classificationVAT>
+						<typ:id>211</typ:id>
+						<typ:ids>PD</typ:ids>
+					</inv:classificationVAT>
+					<inv:text>Popis dokladu 1</inv:text>
+					<inv:partnerIdentity>
+						<typ:id>1154</typ:id>
+						<typ:address>
+							<typ:company>Firma Šťastná 053</typ:company>
+							<typ:city>Město 33</typ:city>
+							<typ:street>Ulice 41</typ:street>
+							<typ:zip>131 00</typ:zip>
+							<typ:ico>90000040</typ:ico>
+							<typ:dic>CZ90000040</typ:dic>
+							<typ:country>
+								<typ:id>40</typ:id>
+								<typ:ids>CZ</typ:ids>
+							</typ:country>
+						</typ:address>
+					</inv:partnerIdentity>
+					<inv:myIdentity>
+						<typ:address>
+							<typ:company>Firma Šťastná 011</typ:company>
+							<typ:city>Město 12</typ:city>
+							<typ:street>Ulice 10</typ:street>
+							<typ:number>9</typ:number>
+							<typ:zip>109 00</typ:zip>
+							<typ:ico>90000010</typ:ico>
+							<typ:dic>CZ90000010</typ:dic>
+							<typ:mobilPhone>600 000 007</typ:mobilPhone>
+							<typ:email>kontakt12@example.cz</typ:email>
+						</typ:address>
+					</inv:myIdentity>
+					<inv:paymentType>
+						<typ:id>1</typ:id>
+						<typ:ids>Příkazem</typ:ids>
+						<typ:paymentType>draft</typ:paymentType>
+					</inv:paymentType>
+					<inv:symConst>0308</inv:symConst>
+					<inv:paymentAccount>
+						<typ:accountNo>000000-0000000021</typ:accountNo>
+						<typ:bankCode>0000</typ:bankCode>
+					</inv:paymentAccount>
+					<inv:liquidation>
+						<typ:date>2026-01-09</typ:date>
+					</inv:liquidation>
+					<inv:lock2>false</inv:lock2>
+					<inv:markRecord>false</inv:markRecord>
+				</inv:invoiceHeader>
+				<inv:invoiceDetail>
+					<inv:invoiceItem>
+						<inv:id>5262</inv:id>
+						<inv:quantity>1.0</inv:quantity>
+						<inv:coefficient>1.0</inv:coefficient>
+						<inv:payVAT>false</inv:payVAT>
+						<inv:rateVAT value="21">high</inv:rateVAT>
+						<inv:discountPercentage>0.0</inv:discountPercentage>
+						<inv:homeCurrency>
+							<typ:unitPrice>16919</typ:unitPrice>
+							<typ:price>16919</typ:price>
+							<typ:priceVAT>3552.99</typ:priceVAT>
+							<typ:priceSum>20471.99</typ:priceSum>
+						</inv:homeCurrency>
+						<inv:foreignCurrency>
+							<typ:unitPrice>700</typ:unitPrice>
+							<typ:price>700</typ:price>
+							<typ:priceVAT>147</typ:priceVAT>
+							<typ:priceSum>847</typ:priceSum>
+						</inv:foreignCurrency>
+					</inv:invoiceItem>
+				</inv:invoiceDetail>
+				<inv:invoiceSummary>
+					<inv:roundingDocument>none</inv:roundingDocument>
+					<inv:roundingVAT>none</inv:roundingVAT>
+					<inv:typeCalculateVATInclusivePrice>VATNewMethod</inv:typeCalculateVATInclusivePrice>
+					<inv:typeCalculateVATForeignCurrency>localAmount</inv:typeCalculateVATForeignCurrency>
+					<inv:homeCurrency>
+						<typ:priceNone>0</typ:priceNone>
+						<typ:priceLow>0</typ:priceLow>
+						<typ:priceLowVAT rate="12">0</typ:priceLowVAT>
+						<typ:priceLowSum>0</typ:priceLowSum>
+						<typ:priceHigh>16919</typ:priceHigh>
+						<typ:priceHighVAT rate="21">3552.99</typ:priceHighVAT>
+						<typ:priceHighSum>20471.99</typ:priceHighSum>
+						<typ:round>
+							<typ:priceRound>0</typ:priceRound>
+						</typ:round>
+					</inv:homeCurrency>
+					<inv:foreignCurrency>
+						<typ:currency>
+							<typ:id>9</typ:id>
+							<typ:ids>EUR</typ:ids>
+						</typ:currency>
+						<typ:rate>24.17</typ:rate>
+						<typ:amount>1</typ:amount>
+						<typ:priceSum>847</typ:priceSum>
+						<typ:round>
+							<typ:priceRound>0</typ:priceRound>
+						</typ:round>
+					</inv:foreignCurrency>
+				</inv:invoiceSummary>
+			</lst:invoice>
+			<lst:invoice version="2.0">
+				<inv:invoiceHeader>
+					<inv:id>5227</inv:id>
+					<inv:invoiceType>receivedInvoice</inv:invoiceType>
+					<inv:number>
+						<typ:id>446</typ:id>
+						<typ:ids>2611</typ:ids>
+						<typ:numberRequested>261100005</typ:numberRequested>
+					</inv:number>
+					<inv:symVar>9000000056</inv:symVar>
+					<inv:originalDocument>DOD00057</inv:originalDocument>
+					<inv:date>2026-01-13</inv:date>
+					<inv:dateTax>2026-01-13</inv:dateTax>
+					<inv:dateAccounting>2026-01-13</inv:dateAccounting>
+					<inv:dateDue>2026-04-02</inv:dateDue>
+					<inv:accounting>
+						<typ:id>256</typ:id>
+						<typ:ids>518001/321001</typ:ids>
+					</inv:accounting>
+					<inv:classificationVAT>
+						<typ:id>211</typ:id>
+						<typ:ids>PD</typ:ids>
+					</inv:classificationVAT>
+					<inv:text>Popis dokladu 21</inv:text>
+					<inv:partnerIdentity>
+						<typ:id>1020</typ:id>
+						<typ:address>
+							<typ:company>Firma Šťastná 033</typ:company>
+							<typ:city>Město 6</typ:city>
+							<typ:street>Ulice 26</typ:street>
+							<typ:zip>109 00</typ:zip>
+							<typ:ico>90000027</typ:ico>
+							<typ:dic>CZ90000027</typ:dic>
+						</typ:address>
+					</inv:partnerIdentity>
+					<inv:myIdentity>
+						<typ:address>
+							<typ:company>Firma Šťastná 011</typ:company>
+							<typ:city>Město 12</typ:city>
+							<typ:street>Ulice 10</typ:street>
+							<typ:number>9</typ:number>
+							<typ:zip>109 00</typ:zip>
+							<typ:ico>90000010</typ:ico>
+							<typ:dic>CZ90000010</typ:dic>
+							<typ:mobilPhone>600 000 007</typ:mobilPhone>
+							<typ:email>kontakt12@example.cz</typ:email>
+						</typ:address>
+					</inv:myIdentity>
+					<inv:paymentType>
+						<typ:id>1</typ:id>
+						<typ:ids>Příkazem</typ:ids>
+						<typ:paymentType>draft</typ:paymentType>
+					</inv:paymentType>
+					<inv:symConst>0308</inv:symConst>
+					<inv:paymentAccount>
+						<typ:accountNo>000000-0000000008</typ:accountNo>
+						<typ:bankCode>0000</typ:bankCode>
+					</inv:paymentAccount>
+					<inv:liquidation>
+						<typ:date>2026-02-03</typ:date>
+					</inv:liquidation>
+					<inv:lock2>false</inv:lock2>
+					<inv:markRecord>false</inv:markRecord>
+				</inv:invoiceHeader>
+				<inv:invoiceDetail>
+					<inv:invoiceItem>
+						<inv:id>5318</inv:id>
+						<inv:text>Položka č. 5</inv:text>
+						<inv:quantity>1.0</inv:quantity>
+						<inv:coefficient>1.0</inv:coefficient>
+						<inv:payVAT>false</inv:payVAT>
+						<inv:rateVAT value="21">high</inv:rateVAT>
+						<inv:discountPercentage>0.0</inv:discountPercentage>
+						<inv:homeCurrency>
+							<typ:unitPrice>1168.17</typ:unitPrice>
+							<typ:price>1168.17</typ:price>
+							<typ:priceVAT>245.32</typ:priceVAT>
+							<typ:priceSum>1413.49</typ:priceSum>
+						</inv:homeCurrency>
+						<inv:accounting>
+							<typ:id>265</typ:id>
+							<typ:ids>518012/321001</typ:ids>
+						</inv:accounting>
+					</inv:invoiceItem>
+					<inv:invoiceItem>
+						<inv:id>5319</inv:id>
+						<inv:text>Položka č. 11</inv:text>
+						<inv:quantity>1.0</inv:quantity>
+						<inv:coefficient>1.0</inv:coefficient>
+						<inv:payVAT>false</inv:payVAT>
+						<inv:rateVAT value="0">none</inv:rateVAT>
+						<inv:discountPercentage>0.0</inv:discountPercentage>
+						<inv:homeCurrency>
+							<typ:unitPrice>-0.49</typ:unitPrice>
+							<typ:price>-0.49</typ:price>
+							<typ:priceVAT>0</typ:priceVAT>
+							<typ:priceSum>-0.49</typ:priceSum>
+						</inv:homeCurrency>
+						<inv:accounting>
+							<typ:id>654</typ:id>
+							<typ:ids>548011/321001</typ:ids>
+						</inv:accounting>
+					</inv:invoiceItem>
+				</inv:invoiceDetail>
+				<inv:invoiceSummary>
+					<inv:roundingDocument>none</inv:roundingDocument>
+					<inv:roundingVAT>none</inv:roundingVAT>
+					<inv:typeCalculateVATInclusivePrice>VATNewMethod</inv:typeCalculateVATInclusivePrice>
+					<inv:typeCalculateVATForeignCurrency>localAmount</inv:typeCalculateVATForeignCurrency>
+					<inv:homeCurrency>
+						<typ:priceNone>-0.49</typ:priceNone>
+						<typ:priceLow>0</typ:priceLow>
+						<typ:priceLowVAT rate="12">0</typ:priceLowVAT>
+						<typ:priceLowSum>0</typ:priceLowSum>
+						<typ:priceHigh>1168.17</typ:priceHigh>
+						<typ:priceHighVAT rate="21">245.32</typ:priceHighVAT>
+						<typ:priceHighSum>1413.49</typ:priceHighSum>
+						<typ:round>
+							<typ:priceRound>0</typ:priceRound>
+						</typ:round>
+					</inv:homeCurrency>
+				</inv:invoiceSummary>
+			</lst:invoice>
+			<lst:invoice version="2.0">
+				<inv:invoiceHeader>
+					<inv:id>5231</inv:id>
+					<inv:invoiceType>receivedInvoice</inv:invoiceType>
+					<inv:number>
+						<typ:id>446</typ:id>
+						<typ:ids>2611</typ:ids>
+						<typ:numberRequested>261100008</typ:numberRequested>
+					</inv:number>
+					<inv:symVar>900000057</inv:symVar>
+					<inv:originalDocument>DOD00058</inv:originalDocument>
+					<inv:date>2026-01-28</inv:date>
+					<inv:dateTax>2026-01-28</inv:dateTax>
+					<inv:dateAccounting>2026-01-28</inv:dateAccounting>
+					<inv:dateDue>2026-02-11</inv:dateDue>
+					<inv:accounting>
+						<typ:id>586</typ:id>
+						<typ:ids>518001/321002</typ:ids>
+					</inv:accounting>
+					<inv:classificationVAT>
+						<typ:id>216</typ:id>
+						<typ:ids>PDslRegEU</typ:ids>
+					</inv:classificationVAT>
+					<inv:text>Popis dokladu 9</inv:text>
+					<inv:partnerIdentity>
+						<typ:id>422</typ:id>
+						<typ:address>
+							<typ:company>Firma Šťastná 032</typ:company>
+							<typ:city>Město 22</typ:city>
+							<typ:zip>120 00</typ:zip>
+							<typ:dic>XX00000003</typ:dic>
+							<typ:country>
+								<typ:id>80</typ:id>
+								<typ:ids>IE</typ:ids>
+							</typ:country>
+						</typ:address>
+					</inv:partnerIdentity>
+					<inv:myIdentity>
+						<typ:address>
+							<typ:company>Firma Šťastná 011</typ:company>
+							<typ:city>Město 12</typ:city>
+							<typ:street>Ulice 10</typ:street>
+							<typ:number>9</typ:number>
+							<typ:zip>109 00</typ:zip>
+							<typ:ico>90000010</typ:ico>
+							<typ:dic>CZ90000010</typ:dic>
+							<typ:mobilPhone>600 000 007</typ:mobilPhone>
+							<typ:email>kontakt12@example.cz</typ:email>
+						</typ:address>
+					</inv:myIdentity>
+					<inv:paymentType>
+						<typ:id>1</typ:id>
+						<typ:ids>Příkazem</typ:ids>
+						<typ:paymentType>draft</typ:paymentType>
+					</inv:paymentType>
+					<inv:symConst>0308</inv:symConst>
+					<inv:note>Poznámka 1</inv:note>
+					<inv:liquidation>
+						<typ:date>2026-01-30</typ:date>
+					</inv:liquidation>
+					<inv:lock2>false</inv:lock2>
+					<inv:markRecord>false</inv:markRecord>
+				</inv:invoiceHeader>
+				<inv:invoiceSummary>
+					<inv:roundingDocument>none</inv:roundingDocument>
+					<inv:roundingVAT>none</inv:roundingVAT>
+					<inv:typeCalculateVATInclusivePrice>VATNewMethod</inv:typeCalculateVATInclusivePrice>
+					<inv:typeCalculateVATForeignCurrency>localAmount</inv:typeCalculateVATForeignCurrency>
+					<inv:homeCurrency>
+						<typ:priceNone>120.02</typ:priceNone>
+						<typ:priceLow>0</typ:priceLow>
+						<typ:priceLowVAT rate="12">0</typ:priceLowVAT>
+						<typ:priceLowSum>0</typ:priceLowSum>
+						<typ:priceHigh>0</typ:priceHigh>
+						<typ:priceHighVAT rate="21">0</typ:priceHighVAT>
+						<typ:priceHighSum>0</typ:priceHighSum>
+						<typ:round>
+							<typ:priceRound>0</typ:priceRound>
+						</typ:round>
+					</inv:homeCurrency>
+					<inv:foreignCurrency>
+						<typ:currency>
+							<typ:id>9</typ:id>
+							<typ:ids>EUR</typ:ids>
+						</typ:currency>
+						<typ:rate>24.295</typ:rate>
+						<typ:amount>1</typ:amount>
+						<typ:priceSum>4.94</typ:priceSum>
+						<typ:round>
+							<typ:priceRound>0</typ:priceRound>
+						</typ:round>
+					</inv:foreignCurrency>
+				</inv:invoiceSummary>
+				<inv:linkedDocuments>
+					<typ:link>
+						<typ:sourceAgenda>internalDocuments</typ:sourceAgenda>
+						<typ:sourceDocument>
+							<typ:id>1085</typ:id>
+							<typ:number>26IN00002</typ:number>
+						</typ:sourceDocument>
+					</typ:link>
+					<typ:link>
+						<typ:sourceAgenda>internalDocuments</typ:sourceAgenda>
+						<typ:sourceDocument>
+							<typ:id>1086</typ:id>
+							<typ:number>26IN00003</typ:number>
+						</typ:sourceDocument>
+					</typ:link>
+				</inv:linkedDocuments>
+			</lst:invoice>
+			<lst:invoice version="2.0">
+				<inv:invoiceHeader>
+					<inv:id>5251</inv:id>
+					<inv:invoiceType>receivedInvoice</inv:invoiceType>
+					<inv:number>
+						<typ:id>446</typ:id>
+						<typ:ids>2611</typ:ids>
+						<typ:numberRequested>261100023</typ:numberRequested>
+					</inv:number>
+					<inv:symVar>9000000058</inv:symVar>
+					<inv:originalDocument>DOD00059</inv:originalDocument>
+					<inv:date>2026-02-06</inv:date>
+					<inv:dateTax>2026-02-06</inv:dateTax>
+					<inv:dateAccounting>2026-02-06</inv:dateAccounting>
+					<inv:dateDue>2026-02-20</inv:dateDue>
+					<inv:dateKHDPH>2026-02-05</inv:dateKHDPH>
+					<inv:accounting>
+						<typ:id>270</typ:id>
+						<typ:ids>518007/321001</typ:ids>
+					</inv:accounting>
+					<inv:classificationVAT>
+						<typ:id>211</typ:id>
+						<typ:ids>PD</typ:ids>
+					</inv:classificationVAT>
+					<inv:text>Popis dokladu 19</inv:text>
+					<inv:partnerIdentity>
+						<typ:id>19</typ:id>
+						<typ:address>
+							<typ:company>Firma Šťastná 039</typ:company>
+							<typ:city>Město 11</typ:city>
+							<typ:street>Ulice 32</typ:street>
+							<typ:zip>125 00</typ:zip>
+							<typ:ico>90000032</typ:ico>
+							<typ:dic>CZ90000032</typ:dic>
+						</typ:address>
+					</inv:partnerIdentity>
+					<inv:myIdentity>
+						<typ:address>
+							<typ:company>Firma Šťastná 011</typ:company>
+							<typ:city>Město 12</typ:city>
+							<typ:street>Ulice 10</typ:street>
+							<typ:number>9</typ:number>
+							<typ:zip>109 00</typ:zip>
+							<typ:ico>90000010</typ:ico>
+							<typ:dic>CZ90000010</typ:dic>
+							<typ:mobilPhone>600 000 007</typ:mobilPhone>
+							<typ:email>kontakt12@example.cz</typ:email>
+						</typ:address>
+					</inv:myIdentity>
+					<inv:paymentType>
+						<typ:id>1</typ:id>
+						<typ:ids>Příkazem</typ:ids>
+						<typ:paymentType>draft</typ:paymentType>
+					</inv:paymentType>
+					<inv:symConst>0308</inv:symConst>
+					<inv:paymentAccount>
+						<typ:accountNo>000000-0000000014</typ:accountNo>
+						<typ:bankCode>0000</typ:bankCode>
+					</inv:paymentAccount>
+					<inv:liquidation>
+						<typ:date>2026-02-19</typ:date>
+					</inv:liquidation>
+					<inv:lock2>false</inv:lock2>
+					<inv:markRecord>false</inv:markRecord>
+				</inv:invoiceHeader>
+				<inv:invoiceSummary>
+					<inv:roundingDocument>none</inv:roundingDocument>
+					<inv:roundingVAT>none</inv:roundingVAT>
+					<inv:typeCalculateVATInclusivePrice>VATNewMethod</inv:typeCalculateVATInclusivePrice>
+					<inv:typeCalculateVATForeignCurrency>localAmount</inv:typeCalculateVATForeignCurrency>
+					<inv:homeCurrency>
+						<typ:priceNone>45</typ:priceNone>
+						<typ:priceLow>0</typ:priceLow>
+						<typ:priceLowVAT rate="12">0</typ:priceLowVAT>
+						<typ:priceLowSum>0</typ:priceLowSum>
+						<typ:priceHigh>2464.48</typ:priceHigh>
+						<typ:priceHighVAT rate="21">517.54</typ:priceHighVAT>
+						<typ:priceHighSum>2982.02</typ:priceHighSum>
+						<typ:round>
+							<typ:priceRound>0</typ:priceRound>
+						</typ:round>
+					</inv:homeCurrency>
+				</inv:invoiceSummary>
+			</lst:invoice>
+			<lst:invoice version="2.0">
+				<inv:invoiceHeader>
+					<inv:id>5276</inv:id>
+					<inv:invoiceType>receivedInvoice</inv:invoiceType>
+					<inv:number>
+						<typ:id>446</typ:id>
+						<typ:ids>2611</typ:ids>
+						<typ:numberRequested>261100043</typ:numberRequested>
+					</inv:number>
+					<inv:symVar>90000000000059</inv:symVar>
+					<inv:originalDocument>DOD00060</inv:originalDocument>
+					<inv:date>2026-02-15</inv:date>
+					<inv:dateTax>2026-02-15</inv:dateTax>
+					<inv:dateAccounting>2026-02-15</inv:dateAccounting>
+					<inv:dateDue>2026-03-01</inv:dateDue>
+					<inv:accounting>
+						<typ:id>291</typ:id>
+						<typ:ids>501002/321001</typ:ids>
+					</inv:accounting>
+					<inv:classificationVAT>
+						<typ:id>211</typ:id>
+						<typ:ids>PD</typ:ids>
+					</inv:classificationVAT>
+					<inv:text>Popis dokladu 36</inv:text>
+					<inv:partnerIdentity>
+						<typ:id>45</typ:id>
+						<typ:address>
+							<typ:company>Firma Šťastná 025</typ:company>
+							<typ:city>Město 17</typ:city>
+							<typ:street>Ulice 21</typ:street>
+							<typ:zip>115 00</typ:zip>
+							<typ:dic>CZ900000006</typ:dic>
+							<typ:country>
+								<typ:id>146</typ:id>
+								<typ:ids>DE</typ:ids>
+							</typ:country>
+						</typ:address>
+					</inv:partnerIdentity>
+					<inv:myIdentity>
+						<typ:address>
+							<typ:company>Firma Šťastná 011</typ:company>
+							<typ:city>Město 12</typ:city>
+							<typ:street>Ulice 10</typ:street>
+							<typ:number>9</typ:number>
+							<typ:zip>109 00</typ:zip>
+							<typ:ico>90000010</typ:ico>
+							<typ:dic>CZ90000010</typ:dic>
+							<typ:mobilPhone>600 000 007</typ:mobilPhone>
+							<typ:email>kontakt12@example.cz</typ:email>
+						</typ:address>
+					</inv:myIdentity>
+					<inv:paymentType>
+						<typ:id>1</typ:id>
+						<typ:ids>Příkazem</typ:ids>
+						<typ:paymentType>draft</typ:paymentType>
+					</inv:paymentType>
+					<inv:symConst>0308</inv:symConst>
+					<inv:liquidation>
+						<typ:date>2026-03-10</typ:date>
+					</inv:liquidation>
+					<inv:lock2>false</inv:lock2>
+					<inv:markRecord>false</inv:markRecord>
+				</inv:invoiceHeader>
+				<inv:invoiceDetail>
+					<inv:invoiceItem>
+						<inv:id>5367</inv:id>
+						<inv:text>Položka č. 3</inv:text>
+						<inv:quantity>1.0</inv:quantity>
+						<inv:coefficient>1.0</inv:coefficient>
+						<inv:payVAT>false</inv:payVAT>
+						<inv:rateVAT value="21">high</inv:rateVAT>
+						<inv:discountPercentage>0.0</inv:discountPercentage>
+						<inv:homeCurrency>
+							<typ:unitPrice>1626.76</typ:unitPrice>
+							<typ:price>1626.76</typ:price>
+							<typ:priceVAT>341.62</typ:priceVAT>
+							<typ:priceSum>1968.38</typ:priceSum>
+						</inv:homeCurrency>
+					</inv:invoiceItem>
+					<inv:invoiceItem>
+						<inv:id>5368</inv:id>
+						<inv:text>Položka č. 4</inv:text>
+						<inv:quantity>1.0</inv:quantity>
+						<inv:coefficient>1.0</inv:coefficient>
+						<inv:payVAT>false</inv:payVAT>
+						<inv:rateVAT value="21">high</inv:rateVAT>
+						<inv:discountPercentage>0.0</inv:discountPercentage>
+						<inv:homeCurrency>
+							<typ:unitPrice>0</typ:unitPrice>
+							<typ:price>0</typ:price>
+							<typ:priceVAT>0</typ:priceVAT>
+							<typ:priceSum>0</typ:priceSum>
+						</inv:homeCurrency>
+						<inv:accounting>
+							<typ:id>422</typ:id>
+							<typ:ids>501004/321001</typ:ids>
+						</inv:accounting>
+					</inv:invoiceItem>
+					<inv:invoiceItem>
+						<inv:id>5369</inv:id>
+						<inv:text>Položka č. 3</inv:text>
+						<inv:quantity>1.0</inv:quantity>
+						<inv:coefficient>1.0</inv:coefficient>
+						<inv:payVAT>false</inv:payVAT>
+						<inv:rateVAT value="21">high</inv:rateVAT>
+						<inv:discountPercentage>0.0</inv:discountPercentage>
+						<inv:homeCurrency>
+							<typ:unitPrice>0</typ:unitPrice>
+							<typ:price>0</typ:price>
+							<typ:priceVAT>0</typ:priceVAT>
+							<typ:priceSum>0</typ:priceSum>
+						</inv:homeCurrency>
+					</inv:invoiceItem>
+					<inv:invoiceItem>
+						<inv:id>5370</inv:id>
+						<inv:text>Položka č. 16</inv:text>
+						<inv:quantity>1.0</inv:quantity>
+						<inv:coefficient>1.0</inv:coefficient>
+						<inv:payVAT>false</inv:payVAT>
+						<inv:rateVAT value="21">high</inv:rateVAT>
+						<inv:discountPercentage>0.0</inv:discountPercentage>
+						<inv:homeCurrency>
+							<typ:unitPrice>0</typ:unitPrice>
+							<typ:price>0</typ:price>
+							<typ:priceVAT>0</typ:priceVAT>
+							<typ:priceSum>0</typ:priceSum>
+						</inv:homeCurrency>
+						<inv:accounting>
+							<typ:id>393</typ:id>
+							<typ:ids>501022/321001</typ:ids>
+						</inv:accounting>
+					</inv:invoiceItem>
+					<inv:invoiceItem>
+						<inv:id>5371</inv:id>
+						<inv:text>Položka č. 17</inv:text>
+						<inv:quantity>1.0</inv:quantity>
+						<inv:coefficient>1.0</inv:coefficient>
+						<inv:payVAT>false</inv:payVAT>
+						<inv:rateVAT value="0">none</inv:rateVAT>
+						<inv:discountPercentage>0.0</inv:discountPercentage>
+						<inv:homeCurrency>
+							<typ:unitPrice>2.44</typ:unitPrice>
+							<typ:price>2.44</typ:price>
+							<typ:priceVAT>0</typ:priceVAT>
+							<typ:priceSum>2.44</typ:priceSum>
+						</inv:homeCurrency>
+						<inv:accounting>
+							<typ:id>395</typ:id>
+							<typ:ids>544001/321001</typ:ids>
+						</inv:accounting>
+						<inv:classificationVAT>
+							<typ:id>14</typ:id>
+							<typ:ids>PN</typ:ids>
+							<typ:classificationVATType>nonSubsume</typ:classificationVATType>
+						</inv:classificationVAT>
+					</inv:invoiceItem>
+				</inv:invoiceDetail>
+				<inv:invoiceSummary>
+					<inv:roundingDocument>none</inv:roundingDocument>
+					<inv:roundingVAT>none</inv:roundingVAT>
+					<inv:typeCalculateVATInclusivePrice>VATNewMethod</inv:typeCalculateVATInclusivePrice>
+					<inv:typeCalculateVATForeignCurrency>localAmount</inv:typeCalculateVATForeignCurrency>
+					<inv:homeCurrency>
+						<typ:priceNone>2.44</typ:priceNone>
+						<typ:priceLow>0</typ:priceLow>
+						<typ:priceLowVAT rate="12">0</typ:priceLowVAT>
+						<typ:priceLowSum>0</typ:priceLowSum>
+						<typ:priceHigh>1626.76</typ:priceHigh>
+						<typ:priceHighVAT rate="21">341.62</typ:priceHighVAT>
+						<typ:priceHighSum>1968.38</typ:priceHighSum>
+						<typ:round>
+							<typ:priceRound>0</typ:priceRound>
+						</typ:round>
+					</inv:homeCurrency>
+				</inv:invoiceSummary>
+			</lst:invoice>
+			<lst:invoice version="2.0">
+				<inv:invoiceHeader>
+					<inv:id>5307</inv:id>
+					<inv:invoiceType>receivedInvoice</inv:invoiceType>
+					<inv:number>
+						<typ:id>446</typ:id>
+						<typ:ids>2611</typ:ids>
+						<typ:numberRequested>261100063</typ:numberRequested>
+					</inv:number>
+					<inv:symVar>9000060</inv:symVar>
+					<inv:originalDocument>DOD00061</inv:originalDocument>
+					<inv:date>2026-03-31</inv:date>
+					<inv:dateTax>2026-03-31</inv:dateTax>
+					<inv:dateAccounting>2026-03-31</inv:dateAccounting>
+					<inv:dateDue>2026-03-31</inv:dateDue>
+					<inv:accounting>
+						<typ:id>687</typ:id>
+						<typ:ids>511/321001</typ:ids>
+					</inv:accounting>
+					<inv:classificationVAT>
+						<typ:id>211</typ:id>
+						<typ:ids>PD</typ:ids>
+					</inv:classificationVAT>
+					<inv:text>Popis dokladu 37</inv:text>
+					<inv:partnerIdentity>
+						<typ:id>865</typ:id>
+						<typ:address>
+							<typ:company>Firma Šťastná 054</typ:company>
+							<typ:city>Město 34</typ:city>
+							<typ:street>Ulice 42</typ:street>
+							<typ:zip>132 00</typ:zip>
+							<typ:ico>90000041</typ:ico>
+							<typ:dic>CZ90000041</typ:dic>
+						</typ:address>
+					</inv:partnerIdentity>
+					<inv:myIdentity>
+						<typ:address>
+							<typ:company>Firma Šťastná 011</typ:company>
+							<typ:city>Město 12</typ:city>
+							<typ:street>Ulice 10</typ:street>
+							<typ:number>9</typ:number>
+							<typ:zip>109 00</typ:zip>
+							<typ:ico>90000010</typ:ico>
+							<typ:dic>CZ90000010</typ:dic>
+							<typ:mobilPhone>600 000 007</typ:mobilPhone>
+							<typ:email>kontakt12@example.cz</typ:email>
+						</typ:address>
+					</inv:myIdentity>
+					<inv:paymentType>
+						<typ:id>1</typ:id>
+						<typ:ids>Příkazem</typ:ids>
+						<typ:paymentType>draft</typ:paymentType>
+					</inv:paymentType>
+					<inv:symConst>0308</inv:symConst>
+					<inv:paymentAccount>
+						<typ:accountNo>000000-0000000022</typ:accountNo>
+						<typ:bankCode>0000</typ:bankCode>
+					</inv:paymentAccount>
+					<inv:intNote>Interní poznámka 1</inv:intNote>
+					<inv:liquidation>
+						<typ:date>2026-03-31</typ:date>
+					</inv:liquidation>
+					<inv:lock2>false</inv:lock2>
+					<inv:markRecord>false</inv:markRecord>
+				</inv:invoiceHeader>
+				<inv:invoiceSummary>
+					<inv:roundingDocument>none</inv:roundingDocument>
+					<inv:roundingVAT>none</inv:roundingVAT>
+					<inv:typeCalculateVATInclusivePrice>VATNewMethod</inv:typeCalculateVATInclusivePrice>
+					<inv:typeCalculateVATForeignCurrency>localAmount</inv:typeCalculateVATForeignCurrency>
+					<inv:homeCurrency>
+						<typ:priceNone>0.04</typ:priceNone>
+						<typ:priceLow>0</typ:priceLow>
+						<typ:priceLowVAT rate="12">0</typ:priceLowVAT>
+						<typ:priceLowSum>0</typ:priceLowSum>
+						<typ:priceHigh>40211.54</typ:priceHigh>
+						<typ:priceHighVAT rate="21">8444.42</typ:priceHighVAT>
+						<typ:priceHighSum>48655.96</typ:priceHighSum>
+						<typ:round>
+							<typ:priceRound>0</typ:priceRound>
+						</typ:round>
+					</inv:homeCurrency>
+				</inv:invoiceSummary>
+			</lst:invoice>
+			<lst:invoice version="2.0">
+				<inv:invoiceHeader>
+					<inv:id>5334</inv:id>
+					<inv:invoiceType>receivedInvoice</inv:invoiceType>
+					<inv:number>
+						<typ:id>446</typ:id>
+						<typ:ids>2611</typ:ids>
+						<typ:numberRequested>261100083</typ:numberRequested>
+					</inv:number>
+					<inv:symVar>9000000061</inv:symVar>
+					<inv:originalDocument>DOD00062</inv:originalDocument>
+					<inv:date>2026-04-08</inv:date>
+					<inv:dateTax>2026-04-08</inv:dateTax>
+					<inv:dateAccounting>2026-04-08</inv:dateAccounting>
+					<inv:dateDue>2026-06-26</inv:dateDue>
+					<inv:dateKHDPH>2026-04-01</inv:dateKHDPH>
+					<inv:accounting>
+						<typ:id>256</typ:id>
+						<typ:ids>518001/321001</typ:ids>
+					</inv:accounting>
+					<inv:classificationVAT>
+						<typ:id>211</typ:id>
+						<typ:ids>PD</typ:ids>
+					</inv:classificationVAT>
+					<inv:text>Popis dokladu 21</inv:text>
+					<inv:partnerIdentity>
+						<typ:id>1020</typ:id>
+						<typ:address>
+							<typ:company>Firma Šťastná 033</typ:company>
+							<typ:city>Město 6</typ:city>
+							<typ:street>Ulice 26</typ:street>
+							<typ:zip>109 00</typ:zip>
+							<typ:ico>90000027</typ:ico>
+							<typ:dic>CZ90000027</typ:dic>
+						</typ:address>
+					</inv:partnerIdentity>
+					<inv:myIdentity>
+						<typ:address>
+							<typ:company>Firma Šťastná 011</typ:company>
+							<typ:city>Město 12</typ:city>
+							<typ:street>Ulice 10</typ:street>
+							<typ:number>9</typ:number>
+							<typ:zip>109 00</typ:zip>
+							<typ:ico>90000010</typ:ico>
+							<typ:dic>CZ90000010</typ:dic>
+							<typ:mobilPhone>600 000 007</typ:mobilPhone>
+							<typ:email>kontakt12@example.cz</typ:email>
+						</typ:address>
+					</inv:myIdentity>
+					<inv:paymentType>
+						<typ:id>1</typ:id>
+						<typ:ids>Příkazem</typ:ids>
+						<typ:paymentType>draft</typ:paymentType>
+					</inv:paymentType>
+					<inv:symConst>0308</inv:symConst>
+					<inv:paymentAccount>
+						<typ:accountNo>000000-0000000008</typ:accountNo>
+						<typ:bankCode>0000</typ:bankCode>
+					</inv:paymentAccount>
+					<inv:liquidation>
+						<typ:date>2026-04-21</typ:date>
+					</inv:liquidation>
+					<inv:lock2>false</inv:lock2>
+					<inv:markRecord>false</inv:markRecord>
+				</inv:invoiceHeader>
+				<inv:invoiceDetail>
+					<inv:invoiceItem>
+						<inv:id>5451</inv:id>
+						<inv:text>Položka č. 5</inv:text>
+						<inv:quantity>1.0</inv:quantity>
+						<inv:coefficient>1.0</inv:coefficient>
+						<inv:payVAT>false</inv:payVAT>
+						<inv:rateVAT value="21">high</inv:rateVAT>
+						<inv:discountPercentage>0.0</inv:discountPercentage>
+						<inv:homeCurrency>
+							<typ:unitPrice>1168.17</typ:unitPrice>
+							<typ:price>1168.17</typ:price>
+							<typ:priceVAT>245.32</typ:priceVAT>
+							<typ:priceSum>1413.49</typ:priceSum>
+						</inv:homeCurrency>
+						<inv:accounting>
+							<typ:id>265</typ:id>
+							<typ:ids>518012/321001</typ:ids>
+						</inv:accounting>
+					</inv:invoiceItem>
+					<inv:invoiceItem>
+						<inv:id>5452</inv:id>
+						<inv:text>Položka č. 11</inv:text>
+						<inv:quantity>1.0</inv:quantity>
+						<inv:coefficient>1.0</inv:coefficient>
+						<inv:payVAT>false</inv:payVAT>
+						<inv:rateVAT value="0">none</inv:rateVAT>
+						<inv:discountPercentage>0.0</inv:discountPercentage>
+						<inv:homeCurrency>
+							<typ:unitPrice>-0.49</typ:unitPrice>
+							<typ:price>-0.49</typ:price>
+							<typ:priceVAT>0</typ:priceVAT>
+							<typ:priceSum>-0.49</typ:priceSum>
+						</inv:homeCurrency>
+						<inv:accounting>
+							<typ:id>654</typ:id>
+							<typ:ids>548011/321001</typ:ids>
+						</inv:accounting>
+					</inv:invoiceItem>
+				</inv:invoiceDetail>
+				<inv:invoiceSummary>
+					<inv:roundingDocument>none</inv:roundingDocument>
+					<inv:roundingVAT>none</inv:roundingVAT>
+					<inv:typeCalculateVATInclusivePrice>VATNewMethod</inv:typeCalculateVATInclusivePrice>
+					<inv:typeCalculateVATForeignCurrency>localAmount</inv:typeCalculateVATForeignCurrency>
+					<inv:homeCurrency>
+						<typ:priceNone>-0.49</typ:priceNone>
+						<typ:priceLow>0</typ:priceLow>
+						<typ:priceLowVAT rate="12">0</typ:priceLowVAT>
+						<typ:priceLowSum>0</typ:priceLowSum>
+						<typ:priceHigh>1168.17</typ:priceHigh>
+						<typ:priceHighVAT rate="21">245.32</typ:priceHighVAT>
+						<typ:priceHighSum>1413.49</typ:priceHighSum>
+						<typ:round>
+							<typ:priceRound>0</typ:priceRound>
+						</typ:round>
+					</inv:homeCurrency>
+				</inv:invoiceSummary>
+			</lst:invoice>
+			<lst:invoice version="2.0">
+				<inv:invoiceHeader>
+					<inv:id>5355</inv:id>
+					<inv:invoiceType>receivedInvoice</inv:invoiceType>
+					<inv:number>
+						<typ:id>446</typ:id>
+						<typ:ids>2611</typ:ids>
+						<typ:numberRequested>261100103</typ:numberRequested>
+					</inv:number>
+					<inv:symVar>9000000000062</inv:symVar>
+					<inv:originalDocument>DOD00063</inv:originalDocument>
+					<inv:date>2026-04-30</inv:date>
+					<inv:dateTax>2026-04-30</inv:dateTax>
+					<inv:dateAccounting>2026-04-30</inv:dateAccounting>
+					<inv:dateDue>2026-05-29</inv:dateDue>
+					<inv:accounting>
+						<typ:id>512</typ:id>
+						<typ:ids>518005/321002</typ:ids>
+					</inv:accounting>
+					<inv:classificationVAT>
+						<typ:id>211</typ:id>
+						<typ:ids>PD</typ:ids>
+					</inv:classificationVAT>
+					<inv:text>Popis dokladu 38</inv:text>
+					<inv:partnerIdentity>
+						<typ:id>353</typ:id>
+						<typ:address>
+							<typ:company>Firma Šťastná 026</typ:company>
+							<typ:city>Město 11</typ:city>
+							<typ:street>Ulice 22</typ:street>
+							<typ:zip>116 00</typ:zip>
+							<typ:ico>90000022</typ:ico>
+							<typ:dic>CZ90000022</typ:dic>
+						</typ:address>
+					</inv:partnerIdentity>
+					<inv:myIdentity>
+						<typ:address>
+							<typ:company>Firma Šťastná 011</typ:company>
+							<typ:city>Město 12</typ:city>
+							<typ:street>Ulice 10</typ:street>
+							<typ:number>9</typ:number>
+							<typ:zip>109 00</typ:zip>
+							<typ:ico>90000010</typ:ico>
+							<typ:dic>CZ90000010</typ:dic>
+							<typ:mobilPhone>600 000 007</typ:mobilPhone>
+							<typ:email>kontakt12@example.cz</typ:email>
+						</typ:address>
+					</inv:myIdentity>
+					<inv:paymentType>
+						<typ:id>1</typ:id>
+						<typ:ids>Příkazem</typ:ids>
+						<typ:paymentType>draft</typ:paymentType>
+					</inv:paymentType>
+					<inv:symConst>0308</inv:symConst>
+					<inv:paymentAccount>
+						<typ:accountNo>000000-0000000003</typ:accountNo>
+						<typ:bankCode>0000</typ:bankCode>
+					</inv:paymentAccount>
+					<inv:liquidation>
+						<typ:date>2026-05-13</typ:date>
+					</inv:liquidation>
+					<inv:lock2>false</inv:lock2>
+					<inv:markRecord>false</inv:markRecord>
+				</inv:invoiceHeader>
+				<inv:invoiceDetail>
+					<inv:invoiceItem>
+						<inv:id>5472</inv:id>
+						<inv:quantity>1.0</inv:quantity>
+						<inv:coefficient>1.0</inv:coefficient>
+						<inv:payVAT>false</inv:payVAT>
+						<inv:rateVAT value="21">high</inv:rateVAT>
+						<inv:discountPercentage>0.0</inv:discountPercentage>
+						<inv:homeCurrency>
+							<typ:unitPrice>243.6</typ:unitPrice>
+							<typ:price>243.6</typ:price>
+							<typ:priceVAT>51.16</typ:priceVAT>
+							<typ:priceSum>294.76</typ:priceSum>
+						</inv:homeCurrency>
+						<inv:foreignCurrency>
+							<typ:unitPrice>10</typ:unitPrice>
+							<typ:price>10</typ:price>
+							<typ:priceVAT>2.1</typ:priceVAT>
+							<typ:priceSum>12.1</typ:priceSum>
+						</inv:foreignCurrency>
+					</inv:invoiceItem>
+				</inv:invoiceDetail>
+				<inv:invoiceSummary>
+					<inv:roundingDocument>none</inv:roundingDocument>
+					<inv:roundingVAT>none</inv:roundingVAT>
+					<inv:typeCalculateVATInclusivePrice>VATNewMethod</inv:typeCalculateVATInclusivePrice>
+					<inv:typeCalculateVATForeignCurrency>localAmount</inv:typeCalculateVATForeignCurrency>
+					<inv:homeCurrency>
+						<typ:priceNone>0</typ:priceNone>
+						<typ:priceLow>0</typ:priceLow>
+						<typ:priceLowVAT rate="12">0</typ:priceLowVAT>
+						<typ:priceLowSum>0</typ:priceLowSum>
+						<typ:priceHigh>243.6</typ:priceHigh>
+						<typ:priceHighVAT rate="21">51.16</typ:priceHighVAT>
+						<typ:priceHighSum>294.76</typ:priceHighSum>
+						<typ:round>
+							<typ:priceRound>0</typ:priceRound>
+						</typ:round>
+					</inv:homeCurrency>
+					<inv:foreignCurrency>
+						<typ:currency>
+							<typ:id>9</typ:id>
+							<typ:ids>EUR</typ:ids>
+						</typ:currency>
+						<typ:rate>24.36</typ:rate>
+						<typ:amount>1</typ:amount>
+						<typ:priceSum>12.1</typ:priceSum>
+						<typ:round>
+							<typ:priceRound>0</typ:priceRound>
+						</typ:round>
+					</inv:foreignCurrency>
+				</inv:invoiceSummary>
+			</lst:invoice>
+			<lst:invoice version="2.0">
+				<inv:invoiceHeader>
+					<inv:id>5381</inv:id>
+					<inv:invoiceType>receivedInvoice</inv:invoiceType>
+					<inv:number>
+						<typ:id>446</typ:id>
+						<typ:ids>2611</typ:ids>
+						<typ:numberRequested>261100123</typ:numberRequested>
+					</inv:number>
+					<inv:symVar>9000000000063</inv:symVar>
+					<inv:originalDocument>DOD00064</inv:originalDocument>
+					<inv:date>2026-05-15</inv:date>
+					<inv:dateTax>2026-05-15</inv:dateTax>
+					<inv:dateAccounting>2026-05-15</inv:dateAccounting>
+					<inv:dateDue>2026-05-29</inv:dateDue>
+					<inv:accounting>
+						<typ:id>273</typ:id>
+						<typ:ids>518005/321001</typ:ids>
+					</inv:accounting>
+					<inv:classificationVAT>
+						<typ:id>211</typ:id>
+						<typ:ids>PD</typ:ids>
+					</inv:classificationVAT>
+					<inv:text>Popis dokladu 39</inv:text>
+					<inv:partnerIdentity>
+						<typ:id>353</typ:id>
+						<typ:address>
+							<typ:company>Firma Šťastná 026</typ:company>
+							<typ:city>Město 11</typ:city>
+							<typ:street>Ulice 22</typ:street>
+							<typ:zip>116 00</typ:zip>
+							<typ:ico>90000022</typ:ico>
+							<typ:dic>CZ90000022</typ:dic>
+						</typ:address>
+					</inv:partnerIdentity>
+					<inv:myIdentity>
+						<typ:address>
+							<typ:company>Firma Šťastná 011</typ:company>
+							<typ:city>Město 12</typ:city>
+							<typ:street>Ulice 10</typ:street>
+							<typ:number>9</typ:number>
+							<typ:zip>109 00</typ:zip>
+							<typ:ico>90000010</typ:ico>
+							<typ:dic>CZ90000010</typ:dic>
+							<typ:mobilPhone>600 000 007</typ:mobilPhone>
+							<typ:email>kontakt12@example.cz</typ:email>
+						</typ:address>
+					</inv:myIdentity>
+					<inv:paymentType>
+						<typ:id>1</typ:id>
+						<typ:ids>Příkazem</typ:ids>
+						<typ:paymentType>draft</typ:paymentType>
+					</inv:paymentType>
+					<inv:symConst>0308</inv:symConst>
+					<inv:paymentAccount>
+						<typ:accountNo>000000-0000000003</typ:accountNo>
+						<typ:bankCode>0000</typ:bankCode>
+					</inv:paymentAccount>
+					<inv:liquidation>
+						<typ:date>2026-05-28</typ:date>
+					</inv:liquidation>
+					<inv:lock2>false</inv:lock2>
+					<inv:markRecord>false</inv:markRecord>
+				</inv:invoiceHeader>
+				<inv:invoiceSummary>
+					<inv:roundingDocument>none</inv:roundingDocument>
+					<inv:roundingVAT>none</inv:roundingVAT>
+					<inv:typeCalculateVATInclusivePrice>VATNewMethod</inv:typeCalculateVATInclusivePrice>
+					<inv:typeCalculateVATForeignCurrency>localAmount</inv:typeCalculateVATForeignCurrency>
+					<inv:homeCurrency>
+						<typ:priceNone>0</typ:priceNone>
+						<typ:priceLow>0</typ:priceLow>
+						<typ:priceLowVAT rate="12">0</typ:priceLowVAT>
+						<typ:priceLowSum>0</typ:priceLowSum>
+						<typ:priceHigh>2.69</typ:priceHigh>
+						<typ:priceHighVAT rate="21">0.56</typ:priceHighVAT>
+						<typ:priceHighSum>3.25</typ:priceHighSum>
+						<typ:round>
+							<typ:priceRound>0</typ:priceRound>
+						</typ:round>
+					</inv:homeCurrency>
+				</inv:invoiceSummary>
+			</lst:invoice>
+			<lst:invoice version="2.0">
+				<inv:invoiceHeader>
+					<inv:id>5411</inv:id>
+					<inv:invoiceType>receivedInvoice</inv:invoiceType>
+					<inv:number>
+						<typ:id>446</typ:id>
+						<typ:ids>2611</typ:ids>
+						<typ:numberRequested>261100143</typ:numberRequested>
+					</inv:number>
+					<inv:symVar>9000000032</inv:symVar>
+					<inv:originalDocument>DOD00065</inv:originalDocument>
+					<inv:date>2026-06-06</inv:date>
+					<inv:dateTax>2026-06-06</inv:dateTax>
+					<inv:dateAccounting>2026-06-06</inv:dateAccounting>
+					<inv:dateDue>2026-06-20</inv:dateDue>
+					<inv:dateKHDPH>2026-06-05</inv:dateKHDPH>
+					<inv:accounting>
+						<typ:id>270</typ:id>
+						<typ:ids>518007/321001</typ:ids>
+					</inv:accounting>
+					<inv:classificationVAT>
+						<typ:id>211</typ:id>
+						<typ:ids>PD</typ:ids>
+					</inv:classificationVAT>
+					<inv:text>Popis dokladu 19</inv:text>
+					<inv:partnerIdentity>
+						<typ:id>19</typ:id>
+						<typ:address>
+							<typ:company>Firma Šťastná 039</typ:company>
+							<typ:city>Město 11</typ:city>
+							<typ:street>Ulice 32</typ:street>
+							<typ:zip>125 00</typ:zip>
+							<typ:ico>90000032</typ:ico>
+							<typ:dic>CZ90000032</typ:dic>
+						</typ:address>
+					</inv:partnerIdentity>
+					<inv:myIdentity>
+						<typ:address>
+							<typ:company>Firma Šťastná 011</typ:company>
+							<typ:city>Město 12</typ:city>
+							<typ:street>Ulice 10</typ:street>
+							<typ:number>9</typ:number>
+							<typ:zip>109 00</typ:zip>
+							<typ:ico>90000010</typ:ico>
+							<typ:dic>CZ90000010</typ:dic>
+							<typ:mobilPhone>600 000 007</typ:mobilPhone>
+							<typ:email>kontakt12@example.cz</typ:email>
+						</typ:address>
+					</inv:myIdentity>
+					<inv:paymentType>
+						<typ:id>1</typ:id>
+						<typ:ids>Příkazem</typ:ids>
+						<typ:paymentType>draft</typ:paymentType>
+					</inv:paymentType>
+					<inv:symConst>0308</inv:symConst>
+					<inv:paymentAccount>
+						<typ:accountNo>000000-0000000014</typ:accountNo>
+						<typ:bankCode>0000</typ:bankCode>
+					</inv:paymentAccount>
+					<inv:liquidation>
+						<typ:date>2026-06-19</typ:date>
+					</inv:liquidation>
+					<inv:lock2>false</inv:lock2>
+					<inv:markRecord>false</inv:markRecord>
+				</inv:invoiceHeader>
+				<inv:invoiceSummary>
+					<inv:roundingDocument>none</inv:roundingDocument>
+					<inv:roundingVAT>none</inv:roundingVAT>
+					<inv:typeCalculateVATInclusivePrice>VATNewMethod</inv:typeCalculateVATInclusivePrice>
+					<inv:typeCalculateVATForeignCurrency>localAmount</inv:typeCalculateVATForeignCurrency>
+					<inv:homeCurrency>
+						<typ:priceNone>45</typ:priceNone>
+						<typ:priceLow>0</typ:priceLow>
+						<typ:priceLowVAT rate="12">0</typ:priceLowVAT>
+						<typ:priceLowSum>0</typ:priceLowSum>
+						<typ:priceHigh>2408.57</typ:priceHigh>
+						<typ:priceHighVAT rate="21">505.8</typ:priceHighVAT>
+						<typ:priceHighSum>2914.37</typ:priceHighSum>
+						<typ:round>
+							<typ:priceRound>0</typ:priceRound>
+						</typ:round>
+					</inv:homeCurrency>
+				</inv:invoiceSummary>
+			</lst:invoice>
+			<lst:invoice version="2.0">
+				<inv:invoiceHeader>
+					<inv:id>5438</inv:id>
+					<inv:invoiceType>receivedInvoice</inv:invoiceType>
+					<inv:number>
+						<typ:id>446</typ:id>
+						<typ:ids>2611</typ:ids>
+						<typ:numberRequested>261100163</typ:numberRequested>
+					</inv:number>
+					<inv:symVar>900000064</inv:symVar>
+					<inv:originalDocument>DOD00066</inv:originalDocument>
+					<inv:date>2026-07-02</inv:date>
+					<inv:dateTax>2026-07-02</inv:dateTax>
+					<inv:dateAccounting>2026-07-02</inv:dateAccounting>
+					<inv:dateDue>2026-07-09</inv:dateDue>
+					<inv:accounting>
+						<typ:id>256</typ:id>
+						<typ:ids>518001/321001</typ:ids>
+					</inv:accounting>
+					<inv:classificationVAT>
+						<typ:id>211</typ:id>
+						<typ:ids>PD</typ:ids>
+					</inv:classificationVAT>
+					<inv:text>Popis dokladu 40</inv:text>
+					<inv:partnerIdentity>
+						<typ:id>1045</typ:id>
+						<typ:address>
+							<typ:company>Firma Šťastná 014</typ:company>
+							<typ:city>Město 6</typ:city>
+							<typ:street>Ulice 27</typ:street>
+							<typ:zip>109 00</typ:zip>
+							<typ:ico>90000013</typ:ico>
+							<typ:dic>CZ90000013</typ:dic>
+						</typ:address>
+					</inv:partnerIdentity>
+					<inv:myIdentity>
+						<typ:address>
+							<typ:company>Firma Šťastná 011</typ:company>
+							<typ:city>Město 12</typ:city>
+							<typ:street>Ulice 10</typ:street>
+							<typ:number>9</typ:number>
+							<typ:zip>109 00</typ:zip>
+							<typ:ico>90000010</typ:ico>
+							<typ:dic>CZ90000010</typ:dic>
+							<typ:mobilPhone>600 000 007</typ:mobilPhone>
+							<typ:email>kontakt12@example.cz</typ:email>
+						</typ:address>
+					</inv:myIdentity>
+					<inv:paymentType>
+						<typ:id>1</typ:id>
+						<typ:ids>Příkazem</typ:ids>
+						<typ:paymentType>draft</typ:paymentType>
+					</inv:paymentType>
+					<inv:symConst>0308</inv:symConst>
+					<inv:paymentAccount>
+						<typ:accountNo>000000-0000000009</typ:accountNo>
+						<typ:bankCode>0000</typ:bankCode>
+					</inv:paymentAccount>
+					<inv:intNote>Interní poznámka 1</inv:intNote>
+					<inv:liquidation>
+						<typ:date>2026-07-21</typ:date>
+					</inv:liquidation>
+					<inv:lock2>false</inv:lock2>
+					<inv:markRecord>false</inv:markRecord>
+				</inv:invoiceHeader>
+				<inv:invoiceSummary>
+					<inv:roundingDocument>none</inv:roundingDocument>
+					<inv:roundingVAT>none</inv:roundingVAT>
+					<inv:typeCalculateVATInclusivePrice>VATNewMethod</inv:typeCalculateVATInclusivePrice>
+					<inv:typeCalculateVATForeignCurrency>localAmount</inv:typeCalculateVATForeignCurrency>
+					<inv:homeCurrency>
+						<typ:priceNone>0</typ:priceNone>
+						<typ:priceLow>0</typ:priceLow>
+						<typ:priceLowVAT rate="12">0</typ:priceLowVAT>
+						<typ:priceLowSum>0</typ:priceLowSum>
+						<typ:priceHigh>5000</typ:priceHigh>
+						<typ:priceHighVAT rate="21">1050</typ:priceHighVAT>
+						<typ:priceHighSum>6050</typ:priceHighSum>
+						<typ:round>
+							<typ:priceRound>0</typ:priceRound>
+						</typ:round>
+					</inv:homeCurrency>
+				</inv:invoiceSummary>
+			</lst:invoice>
+			<lst:invoice version="2.0">
+				<inv:invoiceHeader>
+					<inv:id>5458</inv:id>
+					<inv:invoiceType>receivedInvoice</inv:invoiceType>
+					<inv:number>
+						<typ:id>446</typ:id>
+						<typ:ids>2611</typ:ids>
+						<typ:numberRequested>261100183</typ:numberRequested>
+					</inv:number>
+					<inv:symVar>96</inv:symVar>
+					<inv:originalDocument>DOD00067</inv:originalDocument>
+					<inv:date>2026-07-29</inv:date>
+					<inv:dateTax>2026-07-29</inv:dateTax>
+					<inv:dateAccounting>2026-07-29</inv:dateAccounting>
+					<inv:dateDue>2026-08-12</inv:dateDue>
+					<inv:accounting>
+						<typ:id>291</typ:id>
+						<typ:ids>501002/321001</typ:ids>
+					</inv:accounting>
+					<inv:classificationVAT>
+						<typ:id>211</typ:id>
+						<typ:ids>PD</typ:ids>
+					</inv:classificationVAT>
+					<inv:text>Popis dokladu 41</inv:text>
+					<inv:partnerIdentity>
+						<typ:id>291</typ:id>
+						<typ:address>
+							<typ:company>Firma Šťastná 055</typ:company>
+							<typ:city>Město 6</typ:city>
+							<typ:street>Ulice 43</typ:street>
+							<typ:zip>109 00</typ:zip>
+							<typ:ico>90000042</typ:ico>
+							<typ:dic>CZ90000042</typ:dic>
+						</typ:address>
+					</inv:partnerIdentity>
+					<inv:myIdentity>
+						<typ:address>
+							<typ:company>Firma Šťastná 011</typ:company>
+							<typ:city>Město 12</typ:city>
+							<typ:street>Ulice 10</typ:street>
+							<typ:number>9</typ:number>
+							<typ:zip>109 00</typ:zip>
+							<typ:ico>90000010</typ:ico>
+							<typ:dic>CZ90000010</typ:dic>
+							<typ:mobilPhone>600 000 007</typ:mobilPhone>
+							<typ:email>kontakt12@example.cz</typ:email>
+						</typ:address>
+					</inv:myIdentity>
+					<inv:paymentType>
+						<typ:id>1</typ:id>
+						<typ:ids>Příkazem</typ:ids>
+						<typ:paymentType>draft</typ:paymentType>
+					</inv:paymentType>
+					<inv:symConst>0308</inv:symConst>
+					<inv:paymentAccount>
+						<typ:accountNo>000000-0000000023</typ:accountNo>
+						<typ:bankCode>0000</typ:bankCode>
+					</inv:paymentAccount>
+					<inv:liquidation>
+						<typ:date>2026-07-31</typ:date>
+					</inv:liquidation>
+					<inv:lock2>false</inv:lock2>
+					<inv:markRecord>false</inv:markRecord>
+				</inv:invoiceHeader>
+				<inv:invoiceSummary>
+					<inv:roundingDocument>none</inv:roundingDocument>
+					<inv:roundingVAT>none</inv:roundingVAT>
+					<inv:typeCalculateVATInclusivePrice>VATNewMethod</inv:typeCalculateVATInclusivePrice>
+					<inv:typeCalculateVATForeignCurrency>localAmount</inv:typeCalculateVATForeignCurrency>
+					<inv:homeCurrency>
+						<typ:priceNone>0</typ:priceNone>
+						<typ:priceLow>0</typ:priceLow>
+						<typ:priceLowVAT rate="12">0</typ:priceLowVAT>
+						<typ:priceLowSum>0</typ:priceLowSum>
+						<typ:priceHigh>2191.32</typ:priceHigh>
+						<typ:priceHighVAT rate="21">460.18</typ:priceHighVAT>
+						<typ:priceHighSum>2651.5</typ:priceHighSum>
+						<typ:round>
+							<typ:priceRound>0</typ:priceRound>
+						</typ:round>
+					</inv:homeCurrency>
+				</inv:invoiceSummary>
+			</lst:invoice>
+			<lst:invoice version="2.0">
+				<inv:invoiceHeader>
+					<inv:id>5487</inv:id>
+					<inv:invoiceType>receivedInvoice</inv:invoiceType>
+					<inv:number>
+						<typ:id>446</typ:id>
+						<typ:ids>2611</typ:ids>
+						<typ:numberRequested>261100203</typ:numberRequested>
+					</inv:number>
+					<inv:symVar>9000000000066</inv:symVar>
+					<inv:originalDocument>DOD00068</inv:originalDocument>
+					<inv:date>2026-08-31</inv:date>
+					<inv:dateTax>2026-08-31</inv:dateTax>
+					<inv:dateAccounting>2026-08-31</inv:dateAccounting>
+					<inv:dateDue>2026-09-14</inv:dateDue>
+					<inv:accounting>
+						<typ:id>273</typ:id>
+						<typ:ids>518005/321001</typ:ids>
+					</inv:accounting>
+					<inv:classificationVAT>
+						<typ:id>14</typ:id>
+						<typ:ids>PN</typ:ids>
+						<typ:classificationVATType>nonSubsume</typ:classificationVATType>
+					</inv:classificationVAT>
+					<inv:text>Popis dokladu 5</inv:text>
+					<inv:partnerIdentity>
+						<typ:id>353</typ:id>
+						<typ:address>
+							<typ:company>Firma Šťastná 026</typ:company>
+							<typ:city>Město 11</typ:city>
+							<typ:street>Ulice 22</typ:street>
+							<typ:zip>116 00</typ:zip>
+							<typ:ico>90000022</typ:ico>
+							<typ:dic>CZ90000022</typ:dic>
+						</typ:address>
+					</inv:partnerIdentity>
+					<inv:myIdentity>
+						<typ:address>
+							<typ:company>Firma Šťastná 011</typ:company>
+							<typ:city>Město 12</typ:city>
+							<typ:street>Ulice 10</typ:street>
+							<typ:number>9</typ:number>
+							<typ:zip>109 00</typ:zip>
+							<typ:ico>90000010</typ:ico>
+							<typ:dic>CZ90000010</typ:dic>
+							<typ:mobilPhone>600 000 007</typ:mobilPhone>
+							<typ:email>kontakt12@example.cz</typ:email>
+						</typ:address>
+					</inv:myIdentity>
+					<inv:paymentType>
+						<typ:id>1</typ:id>
+						<typ:ids>Příkazem</typ:ids>
+						<typ:paymentType>draft</typ:paymentType>
+					</inv:paymentType>
+					<inv:symConst>0308</inv:symConst>
+					<inv:paymentAccount>
+						<typ:accountNo>000000-0000000003</typ:accountNo>
+						<typ:bankCode>0000</typ:bankCode>
+					</inv:paymentAccount>
+					<inv:liquidation>
+						<typ:date>2026-09-17</typ:date>
+					</inv:liquidation>
+					<inv:lock2>false</inv:lock2>
+					<inv:markRecord>false</inv:markRecord>
+				</inv:invoiceHeader>
+				<inv:invoiceSummary>
+					<inv:roundingDocument>none</inv:roundingDocument>
+					<inv:roundingVAT>none</inv:roundingVAT>
+					<inv:typeCalculateVATInclusivePrice>VATNewMethod</inv:typeCalculateVATInclusivePrice>
+					<inv:typeCalculateVATForeignCurrency>localAmount</inv:typeCalculateVATForeignCurrency>
+					<inv:homeCurrency>
+						<typ:priceNone>823.83</typ:priceNone>
+						<typ:priceLow>0</typ:priceLow>
+						<typ:priceLowVAT rate="12">0</typ:priceLowVAT>
+						<typ:priceLowSum>0</typ:priceLowSum>
+						<typ:priceHigh>0</typ:priceHigh>
+						<typ:priceHighVAT rate="21">0</typ:priceHighVAT>
+						<typ:priceHighSum>0</typ:priceHighSum>
+						<typ:round>
+							<typ:priceRound>0</typ:priceRound>
+						</typ:round>
+					</inv:homeCurrency>
+				</inv:invoiceSummary>
+			</lst:invoice>
+			<lst:invoice version="2.0">
+				<inv:invoiceHeader>
+					<inv:id>5515</inv:id>
+					<inv:invoiceType>receivedInvoice</inv:invoiceType>
+					<inv:number>
+						<typ:id>446</typ:id>
+						<typ:ids>2611</typ:ids>
+						<typ:numberRequested>261100223</typ:numberRequested>
+					</inv:number>
+					<inv:symVar>9000000067</inv:symVar>
+					<inv:originalDocument>DOD00069</inv:originalDocument>
+					<inv:date>2026-09-01</inv:date>
+					<inv:dateTax>2026-09-01</inv:dateTax>
+					<inv:dateAccounting>2026-09-01</inv:dateAccounting>
+					<inv:dateDue>2026-09-15</inv:dateDue>
+					<inv:dateKHDPH>2026-07-31</inv:dateKHDPH>
+					<inv:accounting>
+						<typ:id>256</typ:id>
+						<typ:ids>518001/321001</typ:ids>
+					</inv:accounting>
+					<inv:classificationVAT>
+						<typ:id>211</typ:id>
+						<typ:ids>PD</typ:ids>
+					</inv:classificationVAT>
+					<inv:text>Popis dokladu 42</inv:text>
+					<inv:partnerIdentity>
+						<typ:id>368</typ:id>
+						<typ:address>
+							<typ:company>Firma Šťastná 042</typ:company>
+							<typ:city>Město 11</typ:city>
+							<typ:street>Ulice 34</typ:street>
+							<typ:zip>116 00</typ:zip>
+							<typ:ico>90000034</typ:ico>
+							<typ:dic>CZ90000034</typ:dic>
+						</typ:address>
+					</inv:partnerIdentity>
+					<inv:myIdentity>
+						<typ:address>
+							<typ:company>Firma Šťastná 011</typ:company>
+							<typ:city>Město 12</typ:city>
+							<typ:street>Ulice 10</typ:street>
+							<typ:number>9</typ:number>
+							<typ:zip>109 00</typ:zip>
+							<typ:ico>90000010</typ:ico>
+							<typ:dic>CZ90000010</typ:dic>
+							<typ:mobilPhone>600 000 007</typ:mobilPhone>
+							<typ:email>kontakt12@example.cz</typ:email>
+						</typ:address>
+					</inv:myIdentity>
+					<inv:paymentType>
+						<typ:id>1</typ:id>
+						<typ:ids>Příkazem</typ:ids>
+						<typ:paymentType>draft</typ:paymentType>
+					</inv:paymentType>
+					<inv:symConst>0308</inv:symConst>
+					<inv:paymentAccount>
+						<typ:accountNo>000000-0000000016</typ:accountNo>
+						<typ:bankCode>0000</typ:bankCode>
+					</inv:paymentAccount>
+					<inv:liquidation>
+						<typ:date>2026-08-21</typ:date>
+					</inv:liquidation>
+					<inv:lock2>false</inv:lock2>
+					<inv:markRecord>false</inv:markRecord>
+				</inv:invoiceHeader>
+				<inv:invoiceSummary>
+					<inv:roundingDocument>none</inv:roundingDocument>
+					<inv:roundingVAT>none</inv:roundingVAT>
+					<inv:typeCalculateVATInclusivePrice>VATNewMethod</inv:typeCalculateVATInclusivePrice>
+					<inv:typeCalculateVATForeignCurrency>localAmount</inv:typeCalculateVATForeignCurrency>
+					<inv:homeCurrency>
+						<typ:priceNone>0</typ:priceNone>
+						<typ:priceLow>0</typ:priceLow>
+						<typ:priceLowVAT rate="12">0</typ:priceLowVAT>
+						<typ:priceLowSum>0</typ:priceLowSum>
+						<typ:priceHigh>460</typ:priceHigh>
+						<typ:priceHighVAT rate="21">96.6</typ:priceHighVAT>
+						<typ:priceHighSum>556.6</typ:priceHighSum>
+						<typ:round>
+							<typ:priceRound>0</typ:priceRound>
+						</typ:round>
+					</inv:homeCurrency>
+				</inv:invoiceSummary>
+			</lst:invoice>
+		</lst:listInvoice>
+	</rsp:responsePackItem>
+</rsp:responsePack>

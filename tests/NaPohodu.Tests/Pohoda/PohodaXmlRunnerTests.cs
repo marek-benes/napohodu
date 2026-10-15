@@ -21,21 +21,21 @@ public sealed class PohodaXmlRunnerTests : IDisposable
     {
         // Cesty bereme jen z argumentů (%~dp0, %~dp4): text dávky (OEM) ani INI (windows-1250)
         // nesmí nést diakritiku z cesty k temp adresáři. response.xml leží vedle INI.
-        File.WriteAllBytes(Path.Combine(_dir.FullName, "fixture.xml"), FixtureFiles.ReadBytes("Synthetic/listAccountingUnit.response.xml"));
+        File.WriteAllBytes(Path.Combine(_dir.FullName, "fixture.xml"), FixtureFiles.ReadBytes(RealFixtures.AccountingUnits));
         var exe = FakePohoda(
             """
             if not "%~1"=="/XML" exit /b 90
             if not "%~2"=="uzivatel" exit /b 91
             if not "%~3"=="tajne heslo" exit /b 92
-            findstr /b /c:"database=StwPh_1" "%~4" >nul || exit /b 93
+            findstr /b /c:"database=90000010_2025.mdb" "%~4" >nul || exit /b 93
             copy /y "%~dp0fixture.xml" "%~dp4response.xml" >nul || exit /b 94
             exit /b 0
             """);
 
-        var response = await Runner(exe).RunAsync(PohodaRequests.ListAccountingUnits(), "StwPh_1", TestContext.Current.CancellationToken);
+        var response = await Runner(exe).RunAsync(PohodaRequests.ListAccountingUnits(), RealFixtures.UnitDataFile2025, TestContext.Current.CancellationToken);
 
-        Assert.Equal(FixtureFiles.ReadBytes("Synthetic/listAccountingUnit.response.xml"), response.RawBytes);
-        Assert.Equal(2, AccountingUnitParser.Parse(response.Document).Count);
+        Assert.Equal(FixtureFiles.ReadBytes(RealFixtures.AccountingUnits), response.RawBytes);
+        Assert.Equal(83, AccountingUnitParser.Parse(response.Document).Count);
     }
 
     [Fact]
