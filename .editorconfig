@@ -14,8 +14,8 @@ indent_size = 2
 [*.md]
 trim_trailing_whitespace = false
 
-# Oficiální XSD a ukázky Pohody necháváme beze změny (windows-1250).
-[docs/pohoda/**]
+# Oficiální XSD, ukázky a fixtures Pohody necháváme beze změny (windows-1250).
+[{docs/pohoda/**,tests/**/Fixtures/**.xml}]
 charset = unset
 end_of_line = unset
 insert_final_newline = unset

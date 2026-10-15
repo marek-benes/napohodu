@@ -1,0 +1,3 @@
+# Odpovědi Pohody a XSD jsou ve windows-1250 a testy kontrolují i dekódování: bajty neměnit.
+tests/**/Fixtures/**/*.xml -text
+docs/pohoda/** -text

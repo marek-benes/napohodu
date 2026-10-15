@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="Windows-1250"?>
+<!-- SYNTETICKÁ odpověď podle list.xsd/invoice.xsd/type.xsd, ne reálný výstup Pohody. Nahradit anonymizovanou reálnou. -->
+<rsp:responsePack version="2.0" id="inv" state="ok" programVersion="00000.0 SQL (0.0.0.0)" application="NaPohodu" note="Export přijatých faktur" xmlns:rsp="http://www.stormware.cz/schema/version_2/response.xsd" xmlns:rdc="http://www.stormware.cz/schema/version_2/documentresponse.xsd" xmlns:typ="http://www.stormware.cz/schema/version_2/type.xsd" xmlns:lst="http://www.stormware.cz/schema/version_2/list.xsd" xmlns:inv="http://www.stormware.cz/schema/version_2/invoice.xsd">
+  <rsp:responsePackItem version="2.0" id="inv" state="ok">
+    <lst:listInvoice version="2.0" dateTimeStamp="2026-10-15T10:00:00" dateValidFrom="2026-10-15" state="ok">
+      <lst:invoice version="2.0">
+        <inv:invoiceHeader>
+          <inv:id>101</inv:id>
+          <inv:invoiceType>receivedInvoice</inv:invoiceType>
+          <inv:number>
+            <typ:id>5</typ:id>
+            <typ:ids>2611</typ:ids>
+            <typ:numberRequested>26110009</typ:numberRequested>
+          </inv:number>
+          <inv:symVar>20260042</inv:symVar>
+          <inv:originalDocument>FV-2026-042</inv:originalDocument>
+          <inv:date>2026-03-02</inv:date>
+          <inv:dateTax>2026-03-01</inv:dateTax>
+          <inv:dateDue>2026-03-16</inv:dateDue>
+          <inv:text>Kancelářské potřeby</inv:text>
+          <inv:partnerIdentity>
+            <typ:id>17</typ:id>
+            <typ:address>
+              <typ:company>Papírnictví Šťastný a.s.</typ:company>
+              <typ:city>Plzeň</typ:city>
+              <typ:ico>11223344</typ:ico>
+            </typ:address>
+          </inv:partnerIdentity>
+        </inv:invoiceHeader>
+        <inv:invoiceSummary>
+          <inv:homeCurrency>
+            <typ:priceNone>10.5</typ:priceNone>
+            <typ:priceLow>100</typ:priceLow>
+            <typ:priceLowVAT rate="12">12</typ:priceLowVAT>
+            <typ:priceLowSum>112</typ:priceLowSum>
+            <typ:priceHigh>1000</typ:priceHigh>
+            <typ:priceHighVAT rate="21">210</typ:priceHighVAT>
+            <typ:priceHighSum>1210</typ:priceHighSum>
+            <typ:price3>0</typ:price3>
+            <typ:price3VAT>0</typ:price3VAT>
+            <typ:price3Sum>0</typ:price3Sum>
+            <typ:round>
+              <typ:priceRound>-0.5</typ:priceRound>
+            </typ:round>
+          </inv:homeCurrency>
+        </inv:invoiceSummary>
+        <inv:attachments>
+          <typ:files>
+            <typ:companyDocumentsFolder>Žluťoučký kůň</typ:companyDocumentsFolder>
+            <typ:subFolder>Fakturace\Přijaté faktury\2611\26110009</typ:subFolder>
+            <typ:file>
+              <typ:name>26110009.pdf</typ:name>
+              <typ:type>PDF soubor</typ:type>
+            </typ:file>
+            <typ:file>
+              <typ:name>26110009_dodaci_list.pdf</typ:name>
+              <typ:type>PDF soubor</typ:type>
+            </typ:file>
+          </typ:files>
+        </inv:attachments>
+      </lst:invoice>
+      <lst:invoice version="2.0">
+        <inv:invoiceHeader>
+          <inv:id>102</inv:id>
+          <inv:invoiceType>receivedInvoice</inv:invoiceType>
+          <inv:number>
+            <typ:numberRequested>26110010</typ:numberRequested>
+          </inv:number>
+          <inv:date>2026-03-05</inv:date>
+          <inv:dateDue>2026-03-19</inv:dateDue>
+          <inv:partnerIdentity>
+            <typ:address>
+              <typ:name>Hans Müller</typ:name>
+            </typ:address>
+          </inv:partnerIdentity>
+          <inv:liquidation>
+            <typ:date>2026-03-10</typ:date>
+            <typ:amountHome>2500</typ:amountHome>
+          </inv:liquidation>
+        </inv:invoiceHeader>
+        <inv:invoiceSummary>
+          <inv:homeCurrency>
+            <typ:priceNone>2500</typ:priceNone>
+          </inv:homeCurrency>
+          <inv:foreignCurrency>
+            <typ:currency>
+              <typ:ids>EUR</typ:ids>
+            </typ:currency>
+            <typ:rate>25</typ:rate>
+            <typ:amount>1</typ:amount>
+            <typ:priceSum>100</typ:priceSum>
+          </inv:foreignCurrency>
+        </inv:invoiceSummary>
+      </lst:invoice>
+    </lst:listInvoice>
+  </rsp:responsePackItem>
+</rsp:responsePack>
