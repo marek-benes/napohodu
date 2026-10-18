@@ -1,6 +1,7 @@
 @page "/"
 @inject PohodaSession Session
 @inject NavigationManager Navigation
+@inject TimeProvider Time
 
 <PageTitle>Zákazník – NaPohodu</PageTitle>
 
@@ -79,6 +80,12 @@
         try
         {
             _units = await Session.GetUnitsAsync(refresh);
+            if (!_yearInitialized)
+            {
+                var currentYear = Time.GetLocalNow().Year;
+                _year = DefaultYear(_units.Value.Select(u => u.Year).OfType<int>(), currentYear)?.ToString(CultureInfo.InvariantCulture) ?? string.Empty;
+                _yearInitialized = true;
+            }
         }
         catch (PohodaException ex)
         {
@@ -89,6 +96,20 @@
             _busy = null;
         }
     }
+
+    /// <summary>
+    /// Výchozí filtr roku po otevření stránky: aktuální rok; když jednotky aktuálního roku ještě nejsou
+    /// (začátek ledna), nejnovější dostupný rok, ať seznam není prázdný. Bez jednotek žádný filtr.
+    /// </summary>
+    internal static int? DefaultYear(IEnumerable<int> years, int currentYear)
+    {
+        var available = years.ToHashSet();
+        return available.Contains(currentYear) ? currentYear
+            : available.Count > 0 ? available.Max()
+            : null;
+    }
+
+    private bool _yearInitialized;
 
     private void Select(AccountingUnit unit) => Navigation.NavigateTo($"z/{Uri.EscapeDataString(unit.DataFile)}");
 }

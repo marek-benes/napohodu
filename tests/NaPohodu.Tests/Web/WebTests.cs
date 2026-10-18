@@ -44,6 +44,16 @@ public class WebTests
         await Assert.ThrowsAsync<PohodaException>(() => session.GetUnitAsync("neexistuje", TestContext.Current.CancellationToken));
     }
 
+    [Theory]
+    [InlineData(new[] { 2024, 2025, 2026 }, 2026, 2026)]
+    [InlineData(new[] { 2024, 2025 }, 2026, 2025)]      // nový ročník ještě nezaložený
+    [InlineData(new[] { 2025, 2027 }, 2026, 2027)]
+    [InlineData(new int[0], 2026, null)]
+    public void Customers_DefaultYear_IsCurrentYearOrNewestAvailable(int[] years, int currentYear, int? expected)
+    {
+        Assert.Equal(expected, NaPohodu.App.Components.Pages.Customers.DefaultYear(years, currentYear));
+    }
+
     [Fact]
     public async Task Serve_RendersPagesOnLocalhostOnly()
     {
