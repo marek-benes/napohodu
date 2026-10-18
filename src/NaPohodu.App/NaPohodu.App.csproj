@@ -6,6 +6,8 @@
     <RootNamespace>NaPohodu.App</RootNamespace>
     <!-- dotnet run: relativní cesty (např. pro uložení odpovědi) vůči složce, odkud se příkaz spouští, ne vůči projektu. -->
     <RunWorkingDirectory>$(MSBuildStartupDirectory)</RunWorkingDirectory>
+    <!-- Ikona převzatá z 1. generace (napohodu-electron/build/icon.ico, zdroj wwwroot/icon.svg); zástupce na ploše ji bere z exe. -->
+    <ApplicationIcon>napohodu.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>

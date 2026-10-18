@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- NaPohodu app icon — stylizovaná spokojená kočičí hlava.
+     Zdrojový návrh; PNG/ICO v build/ a resources/ jsou z něj odvozeny. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4B91F7"/>
+      <stop offset="1" stop-color="#1D4ED8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- pozadí -->
+  <rect width="1024" height="1024" rx="230" fill="url(#bg)"/>
+
+  <!-- hlava s ušima -->
+  <g fill="#FFFFFF">
+    <polygon points="300,520 520,356 258,248"/>
+    <polygon points="724,520 504,356 766,248"/>
+    <circle cx="512" cy="596" r="268"/>
+  </g>
+
+  <!-- obličej -->
+  <g stroke="#1E3A8A" stroke-width="30" stroke-linecap="round" fill="none">
+    <!-- zavřené spokojené oči -->
+    <path d="M 346 630 A 52 52 0 0 1 450 630"/>
+    <path d="M 574 630 A 52 52 0 0 1 678 630"/>
+  </g>
+  <!-- čumáček -->
+  <path d="M 480 692 H 544 L 518 728 Q 512 737 506 728 Z" fill="#1E3A8A"/>
+  <!-- úsměv -->
+  <g stroke="#1E3A8A" stroke-width="24" stroke-linecap="round" fill="none">
+    <path d="M 446 738 A 34 34 0 0 0 510 738"/>
+    <path d="M 514 738 A 34 34 0 0 0 578 738"/>
+  </g>
+</svg>
