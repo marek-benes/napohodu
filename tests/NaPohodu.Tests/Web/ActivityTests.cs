@@ -113,45 +113,6 @@ public class ActivityTests
         return (activity, lifetime, time, shutdown);
     }
 
-    [Fact]
-    public async Task OpenWindows_StoppingNotifiesOpenWindowsAndIgnoresGoneOnes()
-    {
-        var windows = new OpenWindows();
-        var open = new RecordingJs();
-        var gone = new RecordingJs { Fail = true };
-        var closed = new RecordingJs();
-        windows.Add("a", open);
-        windows.Add("b", gone);
-        windows.Add("c", closed);
-        windows.Remove("c");
-
-        await windows.StopAsync(TestContext.Current.CancellationToken);
-
-        Assert.Equal(["napohodu.shutdown"], open.Calls);
-        Assert.Empty(closed.Calls);
-    }
-
-    private sealed class RecordingJs : Microsoft.JSInterop.IJSRuntime
-    {
-        public bool Fail { get; init; }
-
-        public List<string> Calls { get; } = [];
-
-        public ValueTask<TValue> InvokeAsync<TValue>(string identifier, object?[]? args) =>
-            InvokeAsync<TValue>(identifier, CancellationToken.None, args);
-
-        public ValueTask<TValue> InvokeAsync<TValue>(string identifier, CancellationToken cancellationToken, object?[]? args)
-        {
-            if (Fail)
-            {
-                throw new Microsoft.JSInterop.JSDisconnectedException("okno je pryč");
-            }
-
-            Calls.Add(identifier);
-            return ValueTask.FromResult(default(TValue)!);
-        }
-    }
-
     private sealed class FakeLifetime : IHostApplicationLifetime
     {
         public bool StopRequested { get; private set; }

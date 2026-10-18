@@ -1,6 +1,4 @@
-using System.Collections.Concurrent;
 using Microsoft.AspNetCore.Components.Server.Circuits;
-using Microsoft.JSInterop;
 
 namespace NaPohodu.App.Web;
 
@@ -75,58 +73,18 @@ internal sealed class AppActivity
     }
 }
 
-/// <summary>
-/// Počítá otevřená okna podle připojení Blazor obvodů (zavřené okno = odpojení) a eviduje je
-/// v <see cref="OpenWindows"/>, aby jim šlo při ukončení aplikace dát vědět.
-/// </summary>
-internal sealed class WindowTrackingCircuitHandler(AppActivity activity, OpenWindows windows, IJSRuntime js) : CircuitHandler
+/// <summary>Počítá otevřená okna podle připojení Blazor obvodů (zavřené okno = odpojení).</summary>
+internal sealed class WindowTrackingCircuitHandler(AppActivity activity) : CircuitHandler
 {
     public override Task OnConnectionUpAsync(Circuit circuit, CancellationToken cancellationToken)
     {
-        windows.Add(circuit.Id, js);
         activity.WindowOpened();
         return Task.CompletedTask;
     }
 
     public override Task OnConnectionDownAsync(Circuit circuit, CancellationToken cancellationToken)
     {
-        windows.Remove(circuit.Id);
         activity.WindowClosed();
         return Task.CompletedTask;
-    }
-}
-
-/// <summary>
-/// Otevřená okna aplikace. Při ukončení serveru (ikona „Ukončit“, Ctrl+C, vypnutí) dostanou zprávu:
-/// okno se pokusí samo zavřít a jinak místo marného opakování připojení ukáže „NaPohodu je ukončená“.
-/// Jako hostovaná služba se zastavuje dřív než webový server, takže spojení ještě existují.
-/// </summary>
-internal sealed class OpenWindows : IHostedService
-{
-    private static readonly TimeSpan NotifyTimeout = TimeSpan.FromSeconds(2);
-    private readonly ConcurrentDictionary<string, IJSRuntime> _windows = new(StringComparer.Ordinal);
-
-    public void Add(string circuitId, IJSRuntime js) => _windows[circuitId] = js;
-
-    public void Remove(string circuitId) => _windows.TryRemove(circuitId, out _);
-
-    public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
-
-    public Task StopAsync(CancellationToken cancellationToken) => NotifyShutdownAsync();
-
-    public async Task NotifyShutdownAsync()
-    {
-        using var timeout = new CancellationTokenSource(NotifyTimeout);
-        await Task.WhenAll(_windows.Values.Select(async js =>
-        {
-            try
-            {
-                await js.InvokeVoidAsync("napohodu.shutdown", timeout.Token).ConfigureAwait(false);
-            }
-            catch (Exception ex) when (ex is JSException or JSDisconnectedException or OperationCanceledException or InvalidOperationException)
-            {
-                // Okno už je pryč nebo neodpovídá – nevadí, ukončení pokračuje.
-            }
-        })).ConfigureAwait(false);
     }
 }
