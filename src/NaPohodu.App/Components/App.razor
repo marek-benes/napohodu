@@ -15,6 +15,21 @@
     <div id="blazor-error-ui">
         Došlo k chybě. <a href="" class="reload">Načíst znovu</a>
     </div>
+    <div id="app-closed">
+        <img src="@Assets["icon.svg"]" alt="" />
+        <strong>NaPohodu je ukončená.</strong>
+        <span>Okno můžete zavřít. Znovu ji spustíte zástupcem na ploše.</span>
+    </div>
+    <script>
+        // Server před ukončením zavolá napohodu.shutdown(): okno se zkusí zavřít, a když to prohlížeč
+        // nedovolí, místo opakovaného připojování ukáže oznámení o ukončení.
+        window.napohodu = {
+            shutdown() {
+                document.documentElement.classList.add('app-closed');
+                setTimeout(() => window.close(), 100);
+            }
+        };
+    </script>
     <script src="_framework/blazor.web.js"></script>
 </body>
 </html>

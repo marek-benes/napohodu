@@ -46,6 +46,8 @@ public static class AppHost
         builder.Services.AddSingleton<PohodaClient>();
         builder.Services.AddSingleton<PohodaSession>();
         builder.Services.AddSingleton<AppActivity>();
+        builder.Services.AddSingleton<OpenWindows>();
+        builder.Services.AddHostedService(sp => sp.GetRequiredService<OpenWindows>());
         builder.Services.AddScoped<CircuitHandler, WindowTrackingCircuitHandler>();
         builder.Services.AddHostedService<IdleShutdown>();
         configureServices?.Invoke(builder.Services);
