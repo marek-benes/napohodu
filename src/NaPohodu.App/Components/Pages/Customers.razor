@@ -14,7 +14,7 @@
 </div>
 
 <div class="toolbar">
-    <input type="search" placeholder="Hledat název, IČ nebo datový soubor…" @bind="_search" @bind:event="oninput" style="min-width: 320px" />
+    <input type="search" data-autofocus placeholder="Hledat název, IČ nebo datový soubor…" @bind="_search" @bind:event="oninput" style="min-width: 320px" />
     <select @bind="_year">
         <option value="">Všechny roky</option>
         @foreach (var year in Years)

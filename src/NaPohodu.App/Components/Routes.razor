@@ -1,7 +1,8 @@
 <Router AppAssembly="typeof(Program).Assembly">
     <Found Context="routeData">
         <RouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)" />
-        <FocusOnNavigate RouteData="routeData" Selector="h1" />
+        @* Fokus po načtení jen na pole označené data-autofocus (např. vyhledávání zákazníka), ne na nadpis. *@
+        <FocusOnNavigate RouteData="routeData" Selector="[data-autofocus]" />
     </Found>
     <NotFound>
         <LayoutView Layout="typeof(MainLayout)">
