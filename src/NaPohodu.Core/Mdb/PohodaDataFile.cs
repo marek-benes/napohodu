@@ -53,7 +53,9 @@ public static class PohodaDataFile
             throw new PohodaException("Přístup k MDB vyžaduje 32bit proces (Jet 4.0 OLEDB).");
         }
 
-        var builder = new OleDbConnectionStringBuilder { Provider = Provider, DataSource = mdbPath };
+        // Bez OLE DB poolingu (-4): zavřené spojení jinak zůstane chvíli otevřené v poolu i se zámkem .ldb,
+        // a kontrola „jednotku má někdo otevřenou“ by před zápisem našla vlastní zámek z předchozího čtení.
+        var builder = new OleDbConnectionStringBuilder { Provider = Provider, DataSource = mdbPath, OleDbServices = -4 };
         builder["Mode"] = exclusive ? "Share Exclusive" : "Read";
         var connection = new OleDbConnection(builder.ConnectionString);
         try

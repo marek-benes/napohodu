@@ -9,7 +9,8 @@ namespace NaPohodu.Tests.Mdb;
 /// </summary>
 internal static class TestMdb
 {
-    private const string Provider = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=";
+    // Bez OLE DB poolingu jako v produkčním kódu, aby po zavření nezůstal zámek .ldb.
+    private const string Provider = "Provider=Microsoft.Jet.OLEDB.4.0;OLE DB Services=-4;Data Source=";
 
     public static string Create(string path)
     {
@@ -18,7 +19,8 @@ internal static class TestMdb
         dynamic catalog = Activator.CreateInstance(catalogType)!;
         try
         {
-            dynamic connection = catalog.Create(Provider + path + ";Jet OLEDB:Engine Type=5");
+            // ADOX při vytvoření databáze „OLE DB Services“ nepřijme, proto vlastní řetězec.
+            dynamic connection = catalog.Create("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + path + ";Jet OLEDB:Engine Type=5");
             connection.Close();
         }
         finally
