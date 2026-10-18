@@ -122,3 +122,10 @@ Nejdřív s uživatelem rozhodnout **co a kdy** automatizovat (CLI je připraven
 ### D. Plán rozšíření 2/3: sběr a import faktur
 
 Až po B.1 (testovací jednotka). Ověřit XML import přijaté faktury se záložkou Dokumenty (`docs/pohoda/import_faktury_vcetne_zalozky_dokumenty.xml`) na testovací jednotce, pak sběr z adresáře (přejmenované soubory), e-mail (MailKit) a AI analýza (později). Otevřená otázka dobropisů/zálohových faktur se tím stane aktuální.
+
+**Úhrada přijaté faktury pokladnou (dotaz uživatele 2026-10-18, zatím jen rozbor XSD, neověřeno v Pohodě):**
+
+- Podle `voucher.xsd` jde: výdajový pokladní doklad (`vch:voucherHeader/vch:voucherType = expense`, pokladna `vch:cashAccount`) s položkou `vch:voucherDetail/vch:voucherLiquidationItem` („Pouze pro import“). Ta obsahuje `vch:settingsLiquidation` (`sourceAgenda = receivedInvoice`, `sourceDocument/typ:number` nebo `typ:id`, `liquidationPrice` pro částečnou úhradu) a `vch:liquidationItem` (sazba DPH, částka, text, párovací symbol).
+- Nejde: importovat fakturu rovnou jako uhrazenou (`inv:liquidation` je „Pouze pro export, při importu je ignorováno“). `liquidationWithoutLink.xsd` = likvidace bez dokladu, `automaticLiquidation.xsd` = jen bankovní doklady.
+- Import faktury a úhrada najednou: jeden `dat:dataPack` se dvěma `dat:dataPackItem` (faktura, pak výdajový doklad odkazující na její číslo). **Ověřit na testovací jednotce**: zpracuje Pohoda položky postupně, aby doklad fakturu našel? Jinak dvě volání (import faktury → ID z odpovědi → pokladní doklad). Dál ověřit jednoznačnost čísla (`numberRequested` / z odpovědi), chování při selhání úhrady (faktura založená, úhrada ne), DPH na položce likvidace a zaúčtování.
+- Postup: připravit ukázkový XML balíček (faktura + výdajový pokladní doklad) a vyzkoušet jen na testovací jednotce (B.1), ne na ostrých datech.
