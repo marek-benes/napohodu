@@ -41,6 +41,7 @@ skutečné umístění složky na disku.
       (ověřeno dotazem 2026-07 na FA.ID 1825 / 4995)
 - [x] `DocDirs.ID` i `FA.ID` jsou **AutoNumber** (schéma reálné `_2025.mdb`, 2026-10-15).
       2. generace proto vkládá bez ID; AutoNumber přidělil MAX+1 (ověřeno na kopii).
+      **Ostrý zápis 2. generace úspěšný** (uživatel 2026-10-18): Pohoda vložený řádek akceptuje.
 - [x] `inv:id` z XML exportu = `FA.ID` (např. 4451 ↔ `Cislo` 251100002); `FA.Cislo` je TEXT(32).
 - [x] Ve `DocDirs` jsou i jiné agendy (RelAgID 17, 19, 25, 28 – neidentifikováno); pracujeme jen s `RelAgID = 3`.
 - [x] Na disku se může stejné číslo vyskytnout ploše i pod prefixem (`…\251100001` i `…\2511\251100001`);

@@ -4,7 +4,7 @@ Předání kontextu mezi sessions. Při pokračování začni tímto souborem (h
 
 ## Kde jsme
 
-- Repozitář `napohodu-electron` = první generace (Electron). Zatím nearchivovat, dokud 2. generace neprojde ostrým provozem.
+- Repozitář `napohodu-electron` = první generace (Electron). Zatím nearchivovat, dokud 2. generace neprojde ostrým provozem (první ostrý zápis DocDirs už proběhl úspěšně). Pak na GitHubu archivovat (ne mazat), odebrat případného zástupce staré verze z plochy; pozor, v historii jsou commitnuté přihlašovací údaje (chyba č. 7) – repozitář nechat soukromý.
 - Tento repozitář = druhá generace v .NET 10, **funkčně nahrazuje 1. generaci** (bez „Export pro zákazníka“, který byl i tam jen placeholder): seznam jednotek a faktur z Pohody, zatřídění souborů, poznačení DocDirs, export pro kontrolu; CLI + webové UI + okenní spouštěč s ikonou u hodin. 163 testů nad anonymizovanými reálnými daty.
 - **Produkce nainstalovaná** na tomto PC (`%LOCALAPPDATA%\Programs\NaPohodu`, zástupce „NaPohodu“ na ploše, aktualizace `C:\Tools\NAPOHODU-UPDATE.bat`). Vývoj běží odděleně (instance `NaPohodu-vyvoj`, port 5081).
 - **Pozor:** vývoj i produkce sahají na **stejnou Pohodu, stejná data a Dokumenty**. Zápisové operace (přesun, DocDirs, budoucí import) z vývoje míří do ostrých dat.
@@ -99,9 +99,7 @@ Mapování modulů `napohodu-electron/src` → nová generace:
 
 ### A. Ověřit v ostrém provozu (bez nového kódu, s uživatelem)
 
-Nic z toho zatím neproběhlo na ostrých datech – je to největší riziko.
-
-1. **První ostrý zápis DocDirs**: v UI (zástupce) zatřídit jednu fakturu s poznačením při **zavřené** jednotce v Pohodě → v Pohodě zkontrolovat záložku Dokumenty u faktury. Zálohu najdeš v `%LOCALAPPDATA%\NaPohodu\Zalohy`. Výsledek zapsat sem a do `docs/pohoda/mdb/NOTES.md` (INSERT přes AutoNumber Pohoda v praxi ještě „neviděla“).
+1. ~~**První ostrý zápis DocDirs**~~ **Proběhl úspěšně** (uživatel 2026-10-18), zapsáno i v `docs/pohoda/mdb/NOTES.md`.
 2. **Dialog „Vybrat…“**: otevírá se nad oknem aplikace a doplní cestu?
 3. **Vypnutí po nečinnosti**: zavřít okno → do 15 min zmizí ikona u hodin.
 4. **Export pro kontrolu** ostře (kopírování do složky, zatím jen náhled).
