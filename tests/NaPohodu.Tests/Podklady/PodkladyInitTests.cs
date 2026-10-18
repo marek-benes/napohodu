@@ -95,6 +95,36 @@ public sealed class PodkladyInitTests : IDisposable
     }
 
     [Fact]
+    public void Period_FromFilingsBeatsOtherYears()
+    {
+        _root.Dir("Firma", "Šanony", "2025", "Q4", "Banka");
+
+        var plan = PodkladyInit.Plan(_root.Path, "Firma", 2026, null, new(VatPeriod.Monthly, "podle přiznání X"));
+
+        Assert.Equal(VatPeriod.Monthly, plan.Period);
+        Assert.Equal("podle přiznání X", plan.PeriodSource);
+    }
+
+    [Fact]
+    public void Period_RequestedOverridesFilingsWithWarning()
+    {
+        var plan = PodkladyInit.Plan(_root.Path, "Firma", 2026, VatPeriod.Quarterly, new(VatPeriod.Monthly, "podle přiznání X"));
+
+        Assert.Equal(VatPeriod.Quarterly, plan.Period);
+        Assert.Contains(plan.Warnings, w => w == "Zadáno čtvrtletně, ale podle přiznání X je měsíčně.");
+    }
+
+    [Fact]
+    public void Period_ExistingYearBeatsFilings()
+    {
+        _root.Dir("Firma", "Šanony", "2026", "Q1");
+
+        var plan = PodkladyInit.Plan(_root.Path, "Firma", 2026, null, new(VatPeriod.Monthly, "podle přiznání X"));
+
+        Assert.Equal(VatPeriod.Quarterly, plan.Period);
+    }
+
+    [Fact]
     public void Period_CannotChangeExistingYear()
     {
         _root.Dir("Firma", "Šanony", "2026", "01");

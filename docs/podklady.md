@@ -38,13 +38,13 @@ Podklady\<Firma>\                 = název složky firmy v Pohoda\Dokumenty
 
 - Nejdřív **období**, pak agenda (odpovídá předávání podkladů po obdobích). Mzdy, Závěrka a Dokumenty jsou na úrovni roku.
 - Názvy agend jako v Pohodě. Období čistá čísla kvůli řazení.
-- Periodicita DPH (měsíc/čtvrtletí) je nastavení zákazníka v aplikaci (z XML Pohody pravděpodobně nejde zjistit, neověřeno).
+- Periodicita DPH (měsíc/čtvrtletí) se nikam neukládá: XML Pohody ji nevrací (`accountingunit.xsd` nic takového nemá, ověřeno 2026-10-18). Zjistí se z posledního podaného přiznání `DPHDP-<IČO>-<rok>-<období>_…` v `ELvykazy` nebo `ISDS` firmy (období `zari` = měsíčně, `3q` = čtvrtletně; kontrolní hlášení se nepočítá, právnické osoby ho podávají měsíčně vždy), u založených roků z názvů období. U neplátců (bez přiznání) se zadá ručně.
 
 ## Šanony
 
 Šanony plní:
 
-1. **Export aplikace** (opakovatelný, idempotentní):
+1. **Export aplikace** (opakovatelný, idempotentní; **spouští účetní ručně** u zákazníka, v UI nebo z CLI, rozhodnuto 2026-10-18):
 
    | Zdroj | Kde v Dokumentech Pohody | Období |
    |---|---|---|
@@ -122,7 +122,7 @@ Zákazníci nejsou členy sdíleného disku. Většinou mají nasdílené **čte
   | chybějící `Ke zpracování` | založí aplikace; **zápis pro zákazníka musí nasdílet účetní ručně** (aplikace práva na Google Drive nevidí ani nemění) |
 
 - Zákazník je převedený, když existuje `Archiv` nebo nová kostra Šanonů; dokud ne, aplikace do jeho Šanonů nepíše.
-- Provádí `napohodu podklady init -c <ročník> [--period mesicne|ctvrtletne]` (náhled, pak `--apply`): Šanony s čímkoliv mimo strukturu → `Archiv` (jen když Archiv ještě není, jinak se cizí položky jen hlásí), kostra roku jednotky, chybějící `Ke zpracování` a `Vráceno`. Periodicita se pozná z názvů období založených roků, jinak je povinná volba.
+- Provádí `napohodu podklady init -c <ročník> [--period mesicne|ctvrtletne]` (náhled, pak `--apply`): Šanony s čímkoliv mimo strukturu → `Archiv` (jen když Archiv ještě není, jinak se cizí položky jen hlásí), kostra roku jednotky, chybějící `Ke zpracování` a `Vráceno`. Periodicita: zadaná volba > založený rok > poslední přiznání DPH > jiné založené roky; volba je nutná jen u neplátců a k přepsání.
 - `Archiv` zůstává jako „starší podklady“; přesun do nové struktury je volitelný a vždy s náhledem.
 - Sdělení zákazníkovi: „Nahrávejte dál do Ke zpracování. Šanony mají nové uspořádání, starší podklady najdete ve složce Archiv.“
 

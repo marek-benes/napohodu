@@ -41,7 +41,14 @@ public static class PodkladyInit
 {
     private const int MaxListed = 10;
 
-    public static PodkladyInitPlan Plan(string rootPath, string customerFolderName, int year, VatPeriod? requestedPeriod)
+    /// <param name="requestedPeriod">Periodicita zadaná uživatelem; přebije vše kromě už založeného roku.</param>
+    /// <param name="fromFilings">Periodicita podle podaných přiznání (<see cref="VatPeriodDetector"/>).</param>
+    public static PodkladyInitPlan Plan(
+        string rootPath,
+        string customerFolderName,
+        int year,
+        VatPeriod? requestedPeriod,
+        DetectedVatPeriod? fromFilings = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(customerFolderName);
         var customer = Path.Combine(rootPath, customerFolderName);
@@ -98,13 +105,20 @@ public static class PodkladyInit
             return Fail($"rok {year} je už založen {Describe(current)}; periodicitu nejde změnit založením");
         }
 
+        // Založený rok drží konzistenci; přiznání jsou spolehlivější než jiné roky (periodicita se mění).
         var (period, source) = requestedPeriod is { } r ? (r, "zadáno")
             : existing is { } e ? (e, $"podle založeného roku {year}")
+            : fromFilings is not null ? (fromFilings.Period, fromFilings.Source)
             : keepBinders && FromOtherYears(binders, year) is { } other ? (other.Period, $"podle roku {other.Year}")
             : ((VatPeriod?)null, string.Empty);
         if (period is not { } effective)
         {
-            return Fail("periodicitu DPH nelze zjistit ze založených roků, je potřeba ji zadat") with { NeedsPeriod = true };
+            return Fail("periodicitu DPH nelze zjistit (žádné přiznání v Dokumentech ani založený rok), je potřeba ji zadat") with { NeedsPeriod = true };
+        }
+
+        if (requestedPeriod is not null && fromFilings is not null && fromFilings.Period != effective)
+        {
+            warnings.Add($"Zadáno {Describe(effective)}, ale {fromFilings.Source} je {Describe(fromFilings.Period)}.");
         }
 
         if (!keepBinders)

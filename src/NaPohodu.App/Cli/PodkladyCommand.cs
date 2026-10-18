@@ -22,7 +22,8 @@ internal static class PodkladyCommand
         };
         var periodOption = new Option<string?>("--period")
         {
-            Description = "Periodicita DPH: mesicne nebo ctvrtletne. Bez volby se převezme ze založených roků.",
+            Description = "Periodicita DPH: mesicne nebo ctvrtletne. Bez volby se zjistí z posledního podaného přiznání DPH " +
+                "v Dokumentech firmy, případně ze založených roků. Volba je nutná u neplátců a slouží i k přepsání.",
         };
         periodOption.AcceptOnlyFromAmong("mesicne", "ctvrtletne");
         var companyFolderOption = new Option<DirectoryInfo?>("--company-folder")
@@ -89,7 +90,8 @@ internal static class PodkladyCommand
                         throw new PohodaException($"Složku firmy nelze určit ({companyFolder.Source}). Zadejte ji volbou --company-folder.");
                     }
 
-                    var plan = PodkladyInit.Plan(podklady.RootPath, Path.GetFileName(companyFolder.Path), year, period);
+                    var fromFilings = VatPeriodDetector.FromFilings(companyFolder.Path, year);
+                    var plan = PodkladyInit.Plan(podklady.RootPath, Path.GetFileName(companyFolder.Path), year, period, fromFilings);
                     await output.WriteAsync(FormatPlan(plan, unit.DisplayName)).ConfigureAwait(false);
                     if (plan.Error is not null)
                     {
