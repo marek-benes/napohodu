@@ -35,6 +35,9 @@ internal static class AppConfiguration
         return options;
     }
 
+    public static PodkladyOptions GetPodkladyOptions(IConfiguration configuration) =>
+        configuration.GetSection(PodkladyOptions.SectionName).Get<PodkladyOptions>() ?? new PodkladyOptions();
+
     /// <summary>Chyby konfigurace pro volání Pohody, česky; prázdný seznam = v pořádku.</summary>
     public static IReadOnlyList<string> Validate(PohodaOptions options)
     {

@@ -17,7 +17,7 @@ internal static class ConfigCommand
             var instance = AppConfiguration.GetInstanceOptions(services.Configuration);
             await output.WriteLineAsync($"Instance:            {instance.Name}{(instance.IsProduction ? " (produkce)" : " (VÝVOJ)")}, {instance.Url}").ConfigureAwait(false);
             await output.WriteLineAsync($"Program:             {AppContext.BaseDirectory}").ConfigureAwait(false);
-            await output.WriteAsync(Format(options)).ConfigureAwait(false);
+            await output.WriteAsync(Format(options, AppConfiguration.GetPodkladyOptions(services.Configuration))).ConfigureAwait(false);
 
             var errors = AppConfiguration.Validate(options);
             foreach (var error in errors)
@@ -31,8 +31,10 @@ internal static class ConfigCommand
         return command;
     }
 
-    internal static string Format(PohodaOptions options)
+    internal static string Format(PohodaOptions options, PodkladyOptions podklady)
     {
+        var podkladyState = string.IsNullOrWhiteSpace(podklady.RootPath) ? string.Empty
+            : Directory.Exists(podklady.RootPath) ? string.Empty : " (neexistuje)";
         var localFile = Path.Combine(AppContext.BaseDirectory, AppConfiguration.LocalFileName);
         return string.Join(
             Environment.NewLine,
@@ -44,6 +46,7 @@ internal static class ConfigCommand
             $"Heslo:               {(string.IsNullOrEmpty(options.Password) ? "(nenastaveno)" : "(nastaveno)")}",
             $"Timeout:             {options.Timeout}",
             $"Zálohy MDB:          {options.EffectiveBackupPath} (ponechat {options.BackupsToKeep})",
+            $"Podklady:            {Show(podklady.RootPath)}{podkladyState}",
             string.Empty);
     }
 

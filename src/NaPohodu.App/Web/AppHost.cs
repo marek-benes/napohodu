@@ -40,6 +40,7 @@ public static class AppHost
 
         builder.Services.AddRazorComponents().AddInteractiveServerComponents();
         builder.Services.AddSingleton(options);
+        builder.Services.AddSingleton(AppConfiguration.GetPodkladyOptions(services.Configuration));
         builder.Services.AddSingleton(instance);
         builder.Services.AddSingleton(TimeProvider.System);
         builder.Services.AddSingleton(sp => services.RunnerFactory(options, sp.GetRequiredService<ILoggerFactory>()));

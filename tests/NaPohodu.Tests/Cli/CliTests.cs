@@ -231,6 +231,47 @@ public sealed class CliTests : IDisposable
     }
 
     [Fact]
+    public async Task Filing_WithoutSource_UsesCustomerInbox()
+    {
+        using var temp = new Filing.TempDirectory();
+        var company = temp.Dir("Dokumenty", "Firma");
+        temp.File("nová", "Podklady", "Firma", "Ke zpracování", "251100038.pdf");
+        var settings = Settings();
+        settings["Podklady:RootPath"] = Path.Combine(temp.Path, "Podklady");
+
+        var exitCode = await Run(settings, "filing", "-c", RealFixtures.UnitDataFile2025, "--company-folder", company);
+
+        Assert.Equal(PohodaCommandRunner.Ok, exitCode);
+        Assert.Contains("Zdroj: Ke zpracování zákazníka v Podkladech.", _error.ToString(), StringComparison.Ordinal);
+        Assert.Contains(@"Podklady\Firma\Ke zpracování", _output.ToString(), StringComparison.Ordinal);
+        Assert.Contains("Spárováno 1: připraveno 1", _output.ToString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task Filing_WithoutSource_InboxMissing_IsRejected()
+    {
+        using var temp = new Filing.TempDirectory();
+        var company = temp.Dir("Dokumenty", "Firma");
+        var settings = Settings();
+        settings["Podklady:RootPath"] = temp.Dir("Podklady");
+
+        var exitCode = await Run(settings, "filing", "-c", RealFixtures.UnitDataFile2025, "--company-folder", company);
+
+        Assert.Equal(PohodaCommandRunner.InvalidArguments, exitCode);
+        Assert.Contains("chybí složka zákazníka „Firma“", _error.ToString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task Filing_WithoutSourceAndPodklady_IsConfigurationError()
+    {
+        var exitCode = await Run("filing", "-c", RealFixtures.UnitDataFile2025);
+
+        Assert.Equal(PohodaCommandRunner.ConfigurationError, exitCode);
+        Assert.Contains("Podklady:RootPath", _error.ToString(), StringComparison.Ordinal);
+        Assert.False(_runner.WasCalled);
+    }
+
+    [Fact]
     public async Task Filing_MarkDocsWithoutApply_IsRejected()
     {
         using var temp = new Filing.TempDirectory();
@@ -299,6 +340,7 @@ public sealed class CliTests : IDisposable
         Assert.Equal(PohodaCommandRunner.Ok, exitCode);
         Assert.Contains("(nastaveno)", _output.ToString(), StringComparison.Ordinal);
         Assert.DoesNotContain("tajne-heslo", _output.ToString(), StringComparison.Ordinal);
+        Assert.Contains("Podklady:            (nenastaveno)", _output.ToString(), StringComparison.Ordinal);
     }
 
     private Task<int> Run(params string[] args) => Run(Settings(), args);

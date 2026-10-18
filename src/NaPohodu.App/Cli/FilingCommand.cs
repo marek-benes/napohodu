@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Text;
 using NaPohodu.Core.Filing;
 using NaPohodu.Core.Mdb;
+using NaPohodu.Core.Podklady;
 
 namespace NaPohodu.App.Cli;
 
@@ -19,10 +20,10 @@ internal static class FilingCommand
             Description = "Datový soubor účetní jednotky (sloupec „Datový soubor“ z příkazu customers).",
             Required = true,
         };
-        var sourceOption = new Option<DirectoryInfo>("--source", "-s")
+        var sourceOption = new Option<DirectoryInfo?>("--source", "-s")
         {
-            Description = "Adresář se soubory faktur pojmenovanými číslem faktury (např. 251100001.pdf, 251100001_dodaci_list.pdf).",
-            Required = true,
+            Description = "Adresář se soubory faktur pojmenovanými číslem faktury (např. 251100001.pdf, 251100001_dodaci_list.pdf). " +
+                "Výchozí je Ke zpracování zákazníka v Podkladech (Podklady:RootPath).",
         };
         var companyFolderOption = new Option<DirectoryInfo?>("--company-folder")
         {
@@ -55,13 +56,20 @@ internal static class FilingCommand
 
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var source = parseResult.GetValue(sourceOption)!;
+            var source = parseResult.GetValue(sourceOption);
             var companyFolderOverride = parseResult.GetValue(companyFolderOption);
             var error = parseResult.InvocationConfiguration.Error;
-            if (!source.Exists)
+            var podklady = AppConfiguration.GetPodkladyOptions(services.Configuration);
+            if (source is { Exists: false })
             {
                 await error.WriteLineAsync($"Zdrojový adresář neexistuje: {source.FullName}").ConfigureAwait(false);
                 return PohodaCommandRunner.InvalidArguments;
+            }
+
+            if (source is null && string.IsNullOrWhiteSpace(podklady.RootPath))
+            {
+                await error.WriteLineAsync("Zadejte zdroj volbou --source, nebo nastavte kořen Podkladů (Podklady:RootPath).").ConfigureAwait(false);
+                return PohodaCommandRunner.ConfigurationError;
             }
 
             if (companyFolderOverride is { Exists: false })
@@ -86,6 +94,7 @@ internal static class FilingCommand
             }
 
             var failed = false;
+            var sourceUnresolved = false;
 
             var exitCode = await PohodaCommandRunner.RunAsync(
                 parseResult,
@@ -101,7 +110,22 @@ internal static class FilingCommand
                         ? new CompanyFolderResolution(companyFolderOverride.FullName.TrimEnd('\\'), "zadáno volbou --company-folder", [])
                         : CompanyFolderResolver.Resolve(unit, invoices, options.DocumentsPath);
 
-                    var plan = FilingPlanner.Plan(source.FullName, invoices, companyFolder);
+                    var sourcePath = source?.FullName;
+                    if (sourcePath is null)
+                    {
+                        var inbox = CustomerInbox.Resolve(podklady.RootPath, companyFolder);
+                        if (inbox.Path is null)
+                        {
+                            await error.WriteLineAsync($"Zdroj nelze odvodit z Podkladů: {inbox.Source}. Zadejte ho volbou --source.").ConfigureAwait(false);
+                            sourceUnresolved = true;
+                            return;
+                        }
+
+                        sourcePath = inbox.Path;
+                        await error.WriteLineAsync($"Zdroj: {inbox.Source}.").ConfigureAwait(false);
+                    }
+
+                    var plan = FilingPlanner.Plan(sourcePath, invoices, companyFolder);
                     await output.WriteAsync(FormatPlan(plan, unit.DisplayName, invoices.Count)).ConfigureAwait(false);
 
                     if (!apply)
@@ -121,7 +145,10 @@ internal static class FilingCommand
                 },
                 cancellationToken).ConfigureAwait(false);
 
-            return exitCode == PohodaCommandRunner.Ok && failed ? PohodaCommandRunner.PohodaError : exitCode;
+            return exitCode != PohodaCommandRunner.Ok ? exitCode
+                : sourceUnresolved ? PohodaCommandRunner.InvalidArguments
+                : failed ? PohodaCommandRunner.PohodaError
+                : exitCode;
         });
 
         return command;

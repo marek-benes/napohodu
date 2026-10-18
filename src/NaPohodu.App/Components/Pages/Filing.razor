@@ -1,5 +1,7 @@
 @page "/z/{DataFile}/zatrideni"
 @inherits UnitPageBase
+@using NaPohodu.Core.Podklady
+@inject PodkladyOptions Podklady
 
 <PageTitle>Zatřídění faktur – NaPohodu</PageTitle>
 
@@ -10,14 +12,30 @@
     se přesunou do podsložky faktury v Dokumentech Pohody. Nic se nepřepisuje.
 </p>
 
-<FolderInput Id="source" Label="Složka se soubory faktur" Placeholder="např. C:\Users\…\Downloads\faktury" @bind-Value="_source" />
+@* Zdroj = Ke zpracování zákazníka v Podkladech; jiná složka jen jako výjimka nebo když inbox nejde určit. *@
+@if (UseCustomSource)
+{
+    <FolderInput Id="source" Label="Složka se soubory faktur" Hint="@(_inbox is { IsResolved: false } ? $"Ke zpracování: {_inbox.Source}" : null)"
+                 Placeholder="např. C:\Users\…\Downloads\faktury" @bind-Value="_source" />
+    @if (_inbox is { IsResolved: true })
+    {
+        <p><button type="button" class="secondary" @onclick="() => _customSource = false">Zpět na Ke zpracování zákazníka</button></p>
+    }
+}
+else if (_inbox is { IsResolved: true })
+{
+    <p>
+        Zdroj: <strong>@_inbox.Path</strong> <span class="muted">(@_inbox.Source)</span>
+        <button type="button" class="secondary" @onclick="() => _customSource = true">Jiná složka…</button>
+    </p>
+}
 @* Složka firmy se zjišťuje sama; ruční výběr jen když to nejde (firma zatím bez složky v Dokumentech). *@
 @if (_plan is { CompanyFolder.IsResolved: false } || !string.IsNullOrWhiteSpace(_manualFolder))
 {
     <FolderInput Id="folder" Label="Složka firmy v Dokumentech" Hint="NaPohodu ji nenašla – vyberte ji" @bind-Value="_manualFolder" />
 }
 <div class="toolbar">
-    <button disabled="@(Busy is not null || Unit is null || string.IsNullOrWhiteSpace(_source))" @onclick="PlanAsync">Najít soubory k zatřídění</button>
+    <button disabled="@(Busy is not null || Unit is null || (UseCustomSource && string.IsNullOrWhiteSpace(_source)))" @onclick="PlanAsync">Najít soubory k zatřídění</button>
 </div>
 
 <StatusPanel Busy="@Busy" Error="@Error" />
@@ -111,6 +129,8 @@
 
 @code {
     private string _source = string.Empty;
+    private InboxResolution? _inbox;
+    private bool _customSource;
     private string _manualFolder = string.Empty;
     private bool _markDocs = true;
     private FilingPlan? _plan;
@@ -122,6 +142,15 @@
     private int ToMove =>
         _plan?.Items.Count(i => i.Status == FilingStatus.Ready
             || (i.Status == FilingStatus.Conflict && _decisions.GetValueOrDefault(i.SourcePath) == ConflictMode.KeepBoth)) ?? 0;
+
+    private bool UseCustomSource => _customSource || _inbox is { IsResolved: false };
+
+    // Inbox se odvozuje ze složky firmy, a ta z exportu faktur (z cache relace, jinak jedno volání Pohody).
+    protected override async Task OnUnitLoadedAsync(AccountingUnit unit)
+    {
+        var invoices = await Session.GetInvoicesAsync(unit);
+        _inbox = CustomerInbox.Resolve(Podklady.RootPath, PohodaSession.ResolveCompanyFolder(unit, invoices.Value, Options.DocumentsPath, _manualFolder));
+    }
 
     private async Task PlanAsync()
     {
@@ -138,7 +167,20 @@
         {
             var invoices = await Session.GetInvoicesAsync(unit);
             var folder = PohodaSession.ResolveCompanyFolder(unit, invoices.Value, Options.DocumentsPath, _manualFolder);
+            _inbox = CustomerInbox.Resolve(Podklady.RootPath, folder);
+            if (!UseCustomSource && _inbox.Path is { } inbox)
+            {
+                _plan = await Task.Run(() => FilingPlanner.Plan(inbox, invoices.Value, folder));
+                return;
+            }
+
             var source = _source.Trim().Trim('"');
+            if (string.IsNullOrWhiteSpace(source))
+            {
+                Error = $"Složku Ke zpracování nelze určit ({_inbox.Source}). Vyberte složku se soubory faktur.";
+                return;
+            }
+
             _plan = await Task.Run(() => FilingPlanner.Plan(source, invoices.Value, folder));
         });
     }
