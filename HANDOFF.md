@@ -21,7 +21,7 @@ Předání kontextu z analýzy první generace (Electron) do nového repozitář
 | AI analýza faktur | Později. |
 | Provoz | PC účetní trvale zapnuté. Plánované úlohy smí propadnout, vše musí jít spustit ručně z CLI. |
 | Instalace | Jeden počítač (tento), jeden účet Windows, jedna kopie. Spouštění zástupcem na ploše. Produkce oddělená od vývoje (`tools/install.ps1`, viz CLAUDE.md „Provoz“). Rozhodnuto 2026-10-18. |
-| Ovládání pro účetní | Spuštění i ukončení jako běžná aplikace: zástupce → okno (Edge `--app`), křížek → po 15 min nečinnosti se server vypne; ikona u hodin pro kontrolu a „Ukončit“. Výběr složek systémovým dialogem. Bez přepisu UI (zůstává Blazor, ověřitelný v prohlížeči). Zvažováno a zamítnuto: přímé MDB místo XML (nedokumentované schéma, importy jen přes XML), WPF (přepis UI), Blazor Hybrid (nový hostitel, nejde ověřovat v prohlížeči), Windows služba (Pohoda.exe v session 0). Rozhodnuto 2026-10-18. |
+| Ovládání pro účetní | Spuštění i ukončení jako běžná aplikace: zástupce → okno (Edge `--app`), křížek → po 15 min nečinnosti se server vypne; ikona u hodin pro kontrolu a „Ukončit“. Výběr složek systémovým dialogem. Ikona u hodin ověřena uživatelem 2026-10-18. Zavírání okna skriptem při „Ukončit“ v Edge `--app` nefunguje (zkoušeno a vráceno); po ukončení serveru okno ukáže českou hlášku o ztrátě spojení s odkazem na zástupce. Bez přepisu UI (zůstává Blazor, ověřitelný v prohlížeči). Zvažováno a zamítnuto: přímé MDB místo XML (nedokumentované schéma, importy jen přes XML), WPF (přepis UI), Blazor Hybrid (nový hostitel, nejde ověřovat v prohlížeči), Windows služba (Pohoda.exe v session 0). Rozhodnuto 2026-10-18. |
 | mServer | Nepoužívat (instance na jednotku, blokuje zálohy). |
 
 ## Plán rozšíření (od uživatele)

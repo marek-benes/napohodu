@@ -15,6 +15,27 @@
     <div id="blazor-error-ui">
         Došlo k chybě. <a href="" class="reload">Načíst znovu</a>
     </div>
-    <script src="_framework/blazor.web.js"></script>
+    @* Vlastní hláška při ztrátě spojení se serverem; Blazor ji najde podle id a přepíná třídy podle stavu
+       (components-reconnect-show/-retrying = obnovuje se, -failed/-rejected/-resume-failed = server neběží). *@
+    <div id="components-reconnect-modal">
+        <div class="reconnect-box">
+            <img src="@Assets["icon.svg"]" alt="" />
+            <div class="reconnect-retrying">
+                <strong><span class="spinner"></span>Spojení s NaPohodu se přerušilo</strong>
+                <span>Zkouším ho obnovit…</span>
+            </div>
+            <div class="reconnect-lost">
+                <strong>Spojení se serverem NaPohodu bylo ztraceno</strong>
+                <span>NaPohodu nejspíš neběží. Spusťte ji znovu zástupcem na ploše, nebo zkuste stránku načíst znovu.</span>
+                <button type="button" onclick="location.reload()">Zkusit znovu</button>
+            </div>
+        </div>
+    </div>
+    <script src="_framework/blazor.web.js" autostart="false"></script>
+    <script>
+        // Server běží na tomtéž počítači: když se během ~20 s nepřipojí, neběží a čekat nemá smysl
+        // (výchozí Blazor zkouší minuty) – ukáže se výzva spustit NaPohodu znovu.
+        Blazor.start({ circuit: { reconnectionOptions: { maxRetries: 5, retryIntervalMilliseconds: 1000 } } });
+    </script>
 </body>
 </html>
