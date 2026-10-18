@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Okenní spouštěč pro účetní (zástupce na ploše): webový server ve stejném procesu, ikona u hodin,
+    okno aplikace. WinForms jen pro integraci se systémem (ikona v oznamovací oblasti, dialog výběru
+    složky) – nikdy pro obrazovky; ty jsou v NaPohodu.App (Blazor).
+    Webové soubory (wwwroot, manifesty) dodává publikace NaPohodu.App do stejné složky.
+  -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyName>NaPohodu.Desktop</AssemblyName>
+    <RootNamespace>NaPohodu.Desktop</RootNamespace>
+    <ApplicationIcon>..\NaPohodu.App\napohodu.ico</ApplicationIcon>
+    <RunWorkingDirectory>$(MSBuildStartupDirectory)</RunWorkingDirectory>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NaPohodu.App\NaPohodu.App.csproj" />
+  </ItemGroup>
+
+</Project>

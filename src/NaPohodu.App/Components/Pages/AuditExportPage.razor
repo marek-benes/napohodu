@@ -15,14 +15,8 @@
     <label>do <input type="date" @bind="_to" /></label>
     <button class="secondary" @onclick="PreviousMonth">Minulý měsíc</button>
 </div>
-<div class="form-row">
-    <label for="dest">Cílová složka</label>
-    <input id="dest" type="text" placeholder="např. C:\Users\…\Desktop\kontrola" @bind="_destination" />
-</div>
-<div class="form-row">
-    <label for="folder">Složka firmy v Dokumentech <span class="muted">(nepovinné – jinak se zjistí z Pohody)</span></label>
-    <input id="folder" type="text" @bind="_manualFolder" />
-</div>
+<FolderInput Id="dest" Label="Cílová složka" Placeholder="např. C:\Users\…\Desktop\kontrola" @bind-Value="_destination" />
+<FolderInput Id="folder" Label="Složka firmy v Dokumentech" Hint="nepovinné – jinak se zjistí z Pohody" @bind-Value="_manualFolder" />
 <div class="toolbar">
     <button disabled="@(Busy is not null || Unit is null)" @onclick="PlanAsync">Vyhledat soubory</button>
 </div>

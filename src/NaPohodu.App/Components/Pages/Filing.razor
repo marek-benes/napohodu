@@ -10,14 +10,8 @@
     se přesunou do podsložky faktury v Dokumentech Pohody. Nic se nepřepisuje.
 </p>
 
-<div class="form-row">
-    <label for="source">Složka se soubory faktur</label>
-    <input id="source" type="text" placeholder="např. C:\Users\…\Downloads\faktury" @bind="_source" />
-</div>
-<div class="form-row">
-    <label for="folder">Složka firmy v Dokumentech <span class="muted">(nepovinné – jinak se zjistí z Pohody)</span></label>
-    <input id="folder" type="text" @bind="_manualFolder" />
-</div>
+<FolderInput Id="source" Label="Složka se soubory faktur" Placeholder="např. C:\Users\…\Downloads\faktury" @bind-Value="_source" />
+<FolderInput Id="folder" Label="Složka firmy v Dokumentech" Hint="nepovinné – jinak se zjistí z Pohody" @bind-Value="_manualFolder" />
 <div class="toolbar">
     <button disabled="@(Busy is not null || Unit is null || string.IsNullOrWhiteSpace(_source))" @onclick="PlanAsync">Načíst plán</button>
 </div>

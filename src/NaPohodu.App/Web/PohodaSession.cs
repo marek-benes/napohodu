@@ -9,10 +9,11 @@ internal sealed record Loaded<T>(T Value, DateTimeOffset LoadedAt);
 
 /// <summary>
 /// Data z Pohody pro webové UI s cache: seznam jednotek a přijaté faktury per jednotka se načtou
-/// jednou a obnovují se jen ručně (1. generace exportovala při každém otevření obrazovky).
-/// Volání Pohody se řadí za sebe: každé spouští Pohoda.exe a souběh nemá smysl.
+/// jednou a obnovují se ručně, nebo samy, když jsou starší než <see cref="InstanceOptions.CacheMaxAge"/>
+/// (aplikace může běžet dlouho a účetní mezitím pracuje v Pohodě). 1. generace exportovala při
+/// každém otevření obrazovky. Volání Pohody se řadí za sebe: každé spouští Pohoda.exe a souběh nemá smysl.
 /// </summary>
-internal sealed class PohodaSession(PohodaClient client, TimeProvider time) : IDisposable
+internal sealed class PohodaSession(PohodaClient client, TimeProvider time, InstanceOptions instance, AppActivity activity) : IDisposable
 {
     private readonly SemaphoreSlim _pohoda = new(1, 1);
     private readonly Dictionary<string, Loaded<IReadOnlyList<Invoice>>> _invoices = new(StringComparer.OrdinalIgnoreCase);
@@ -20,7 +21,7 @@ internal sealed class PohodaSession(PohodaClient client, TimeProvider time) : ID
 
     public async Task<Loaded<IReadOnlyList<AccountingUnit>>> GetUnitsAsync(bool refresh = false, CancellationToken cancellationToken = default)
     {
-        if (!refresh && _units is { } cached)
+        if (!refresh && _units is { } cached && IsFresh(cached))
         {
             return cached;
         }
@@ -43,7 +44,7 @@ internal sealed class PohodaSession(PohodaClient client, TimeProvider time) : ID
 
         lock (_invoices)
         {
-            if (!refresh && _invoices.TryGetValue(unit.DataFile, out var cached))
+            if (!refresh && _invoices.TryGetValue(unit.DataFile, out var cached) && IsFresh(cached))
             {
                 return cached;
             }
@@ -77,8 +78,13 @@ internal sealed class PohodaSession(PohodaClient client, TimeProvider time) : ID
 
     public void Dispose() => _pohoda.Dispose();
 
+    private bool IsFresh<T>(Loaded<T> loaded) =>
+        instance.CacheMaxAge <= TimeSpan.Zero || time.GetUtcNow() - loaded.LoadedAt < instance.CacheMaxAge;
+
     private async Task<T> RunAsync<T>(Func<CancellationToken, Task<T>> call, CancellationToken cancellationToken)
     {
+        // Volání Pohody je operace: „Ukončit“ ani vypnutí po nečinnosti ho nepřeruší.
+        using var operation = activity.BeginOperation();
         await _pohoda.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {

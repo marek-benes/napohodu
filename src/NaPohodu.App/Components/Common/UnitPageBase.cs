@@ -21,6 +21,9 @@ public abstract class UnitPageBase : ComponentBase
     [Inject]
     internal PohodaOptions Options { get; set; } = default!;
 
+    [Inject]
+    internal AppActivity Activity { get; set; } = default!;
+
     protected AccountingUnit? Unit { get; private set; }
 
     protected string? Error { get; set; }
@@ -49,10 +52,13 @@ public abstract class UnitPageBase : ComponentBase
     /// <summary>
     /// Spustí operaci se spinnerem; chyby Pohody, MDB a souborů zobrazí jako text místo pádu obvodu.
     /// Pomalé synchronní části (MDB, disk) volejte uvnitř přes <see cref="Task.Run(Action)"/>.
+    /// Operace se počítá jako rozběhnutá: „Ukončit“ na ni počká a vypnutí po nečinnosti ji nepřeruší,
+    /// i když účetní mezitím zavře okno.
     /// </summary>
     protected async Task RunAsync(string busyText, Func<Task> action)
     {
         ArgumentNullException.ThrowIfNull(action);
+        using var operation = Activity.BeginOperation();
         Busy = busyText;
         Error = null;
         StateHasChanged();

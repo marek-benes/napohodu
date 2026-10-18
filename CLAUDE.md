@@ -30,14 +30,16 @@ Toto je **druhá generace** aplikace. První generace (Electron + TypeScript) je
 - **.NET 10 (LTS), C#**, jeden jazyk pro vše. Žádný Node, žádný PowerShell most.
 - **Build `win-x86`**: Jet 4.0 OLEDB provider (přístup k MDB) existuje jen 32bit. Je to dané Pohodou.
 - **Jeden spustitelný soubor s podpříkazy** (`napohodu serve`, `napohodu filing …`, `napohodu collect …`). CLI slouží Task Scheduleru, `serve` spouští webové UI.
-- **Web UI: ASP.NET Core + Blazor** (Razor komponenty, C#). Ne WinForms. Styling bez Node toolchainu (CSS framework z CDN nebo Tailwind standalone).
+- **Web UI: ASP.NET Core + Blazor** (Razor komponenty, C#). Obrazovky nikdy ve WinForms. Vlastní CSS bez CDN (offline).
+- **WinForms jen v `src/NaPohodu.Desktop`** a jen pro integraci se systémem: ikona v oznamovací oblasti (stav, „Otevřít“, „Ukončit“) a systémový dialog výběru složky (`IFolderPicker`). Nikdy pro obrazovky; App ani Core na WinForms nezávisí.
 - **Struktura řešení**
 
 ```
 NaPohodu.slnx
   src/NaPohodu.Core     doménové modely, Pohoda XML (export/import), MDB (DocDirs), zatřídění souborů,
                         později e-mail (MailKit), AI analýza, reporty
-  src/NaPohodu.App      jeden exe: CLI (System.CommandLine) + `serve` (ASP.NET Core/Blazor)
+  src/NaPohodu.App      napohodu.exe: CLI (System.CommandLine) + webové UI (ASP.NET Core/Blazor, `serve`)
+  src/NaPohodu.Desktop  NaPohodu.Desktop.exe: okenní spouštěč pro účetní (server + ikona u hodin + okno)
   tests/NaPohodu.Tests  xUnit; fixtures = reálné XML odpovědi Pohody a kopie MDB
 ```
 
@@ -133,9 +135,12 @@ dotnet publish src/NaPohodu.App -c Release -o publish
 - `nuget.config` v repozitáři nastavuje nuget.org (nespoléhat na globální konfiguraci stroje).
 - CLI (`src/NaPohodu.App/Cli`): `napohodu customers [--year] [--search]`, `napohodu invoices -c <dataFile> [--from --to RRRR-MM-DD] [--ico]`, `napohodu config`, `napohodu filing -c <dataFile> --source <adresář> [--company-folder] [--apply] [--on-conflict Skip|KeepBoth]` (výchozí náhled; přesun až s `--apply`, nikdy nepřepisuje; `--mark-docs` po přesunu poznačí DocDirs), `napohodu docdirs -c <dataFile> [--company-folder] [--apply]` (rekonciliace DocDirs se složkami na disku, výchozí náhled), `napohodu audit-export -c <dataFile> --dest <složka> [--from --to] [--dry-run]` (kopie souborů faktur za období podle DUZP, ze `subFolder` evidovaného v Pohodě; soubory nepojmenované číslem dostanou prefix čísla; bezpečné při opakování). Společné `--verbose` (logy na stderr) a `--save-response <soubor>` (surová odpověď Pohody → podklad pro fixtures, před commitem anonymizovat). Tabulky jdou na stdout, hlášky a logy na stderr. Návratové kódy: 0 OK, 1 chyba Pohody / chybné volby, 2 konfigurace, 64 nesmyslné volby, 130 přerušeno.
 - **Provoz**: jeden počítač, jeden účet Windows, jedna kopie. Produkce a vývoj se nemíchají:
-  - produkce: `tools/install.ps1` (testy → publikace → `%LOCALAPPDATA%\Programs\NaPohodu`, zástupce „NaPohodu“ na ploše = `napohodu.exe serve`, minimalizované okno), data/zálohy `%LOCALAPPDATA%\NaPohodu`, port 5080; produkční `appsettings.Local.json` se při aktualizaci nepřepisuje (při první instalaci se převezme z `src/NaPohodu.App`), `VERZE.txt` = commit;
+  - produkce: `tools/install.ps1` (testy → publikace Desktop + App do jedné složky → `%LOCALAPPDATA%\Programs\NaPohodu`, zástupce „NaPohodu“ na ploše = `NaPohodu.Desktop.exe`), data/zálohy `%LOCALAPPDATA%\NaPohodu`, port 5080; produkční `appsettings.Local.json` se při aktualizaci nepřepisuje (při první instalaci se převezme z `src/NaPohodu.App`), `VERZE.txt` = commit;
   - vývoj: `dotnet run` přes `Properties/launchSettings.json` → instance `NaPohodu-vyvoj`, port 5081, data `%LOCALAPPDATA%\NaPohodu-vyvoj`, v UI štítek „VÝVOJ“;
-  - `serve` drží zámek jedné kopie (`Local\<instance>-serve`); druhé spuštění jen otevře prohlížeč. `napohodu config` ukazuje, která instance běží.
+  - spouštění pro účetní: `NaPohodu.Desktop.exe` (WinExe, bez konzole) spustí webový server (`Web/AppHost`), ikonu u hodin a okno aplikace (Edge `--app`, `Web/AppWindow`). Zavření okna → po `Instance:IdleShutdown` (výchozí 15 min, 0 = nikdy) bez okna a bez rozběhnuté operace se aplikace sama vypne (`Web/IdleShutdown`, `Web/AppActivity` počítá okna = Blazor obvody a operace = `UnitPageBase.RunAsync` + volání Pohody). „Ukončit“ z ikony počká na operace (max 2 min). Data z Pohody starší než `Instance:CacheMaxAge` (4 h) se načtou znovu.
+  - `napohodu serve` (konzole) je pro vývoj a ladění, bez dialogu výběru složky (tlačítko „Vybrat…“ jen s `IFolderPicker`).
+  - zámek jedné kopie (`Local\<instance>-serve`) sdílí Desktop i serve; druhé spuštění jen otevře okno. `napohodu config` ukazuje, která instance běží.
+  - publikace nesmí obsahovat `*.staticwebassets.runtime.json` (odkazuje do repozitáře); instalace ho odstraní a hlídá.
   - `appsettings.Local.json` se nikdy nepublikuje (`CopyToPublishDirectory=Never`).
   - aktualizace na tomto PC: `C:\Tools\NAPOHODU-UPDATE.bat` (mimo repozitář): `git pull --ff-only` → dotaz při necommitnutých změnách → `tools/install.ps1`.
 - Webové UI: `napohodu serve [--port] [--no-browser]` – Blazor Server jen na `127.0.0.1`, bez přihlašování. Zákazník je v adrese (`/z/<datový soubor>/faktury|zatrideni|dokumenty|export-kontrola`), takže přežije obnovení stránky. `Web/PohodaSession` drží cache jednotek a faktur (ruční „Obnovit z Pohody“) a řadí volání Pohody za sebe. Stránky dědí `Components/Common/UnitPageBase` (načtení jednotky, spinner, chyby jako text) a logiku volají z Core. Vlastní `wwwroot/app.css` bez CDN (offline). Razor: string parametry komponent předávat s `@` (`Busy="@Busy"`), jinak se předá doslovný text.

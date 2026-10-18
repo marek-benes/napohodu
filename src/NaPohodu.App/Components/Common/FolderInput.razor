@@ -1,0 +1,63 @@
+@* Pole s cestou ke složce; v okenní aplikaci s tlačítkem „Vybrat…“ (systémový dialog). *@
+@inject IServiceProvider Services
+
+<div class="form-row">
+    <label for="@Id">@Label @if (Hint is not null) {<span class="muted">(@Hint)</span>}</label>
+    <div class="input-with-button">
+        <input id="@Id" type="text" placeholder="@Placeholder" value="@Value" @onchange="OnChangedAsync" />
+        @if (_picker is not null)
+        {
+            <button type="button" class="secondary" disabled="@_picking" @onclick="PickAsync">Vybrat…</button>
+        }
+    </div>
+</div>
+
+@code {
+    private IFolderPicker? _picker;
+    private bool _picking;
+
+    [Parameter, EditorRequired]
+    public string Id { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string Label { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? Hint { get; set; }
+
+    [Parameter]
+    public string? Placeholder { get; set; }
+
+    [Parameter]
+    public string Value { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
+
+    protected override void OnInitialized() => _picker = Services.GetService<IFolderPicker>();
+
+    private Task OnChangedAsync(ChangeEventArgs e) => SetAsync(e.Value as string ?? string.Empty);
+
+    private async Task PickAsync()
+    {
+        _picking = true;
+        try
+        {
+            var initial = Value.Trim().Trim('"');
+            if (await _picker!.PickFolderAsync(Label, Directory.Exists(initial) ? initial : null) is { } folder)
+            {
+                await SetAsync(folder);
+            }
+        }
+        finally
+        {
+            _picking = false;
+        }
+    }
+
+    private async Task SetAsync(string value)
+    {
+        Value = value;
+        await ValueChanged.InvokeAsync(value);
+    }
+}

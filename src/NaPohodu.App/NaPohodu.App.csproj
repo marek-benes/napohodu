@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="NaPohodu.Tests" />
+    <InternalsVisibleTo Include="NaPohodu.Desktop" />
   </ItemGroup>
 
   <ItemGroup>

@@ -48,6 +48,8 @@ main { flex: 1; padding: 1.5rem 2rem; overflow: auto; }
 .form-row label { font-weight: 500; }
 input[type=text], input[type=date], input[type=search], select { padding: .45rem .6rem; border: 1px solid var(--border); border-radius: 6px; font: inherit; }
 input[type=text] { width: 100%; }
+.input-with-button { display: flex; gap: .5rem; }
+.input-with-button input { flex: 1; }
 button { padding: .45rem .9rem; border-radius: 6px; border: 1px solid var(--accent); background: var(--accent); color: #fff; font: inherit; font-weight: 500; cursor: pointer; }
 button.secondary { background: var(--bg); color: var(--text); border-color: var(--border); }
 button.danger { background: var(--error); border-color: var(--error); }
