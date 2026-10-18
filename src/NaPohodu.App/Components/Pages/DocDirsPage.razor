@@ -10,9 +10,12 @@
     Dokumenty jsou společné pro všechny roky, poznačuje se každý ročník zvlášť. Existující jiné poznačení se nikdy nepřepisuje.
 </p>
 
-<FolderInput Id="folder" Label="Složka firmy v Dokumentech" Hint="nepovinné – jinak se zjistí z Pohody" @bind-Value="_manualFolder" />
+@if (_folderUnresolved || !string.IsNullOrWhiteSpace(_manualFolder))
+{
+    <FolderInput Id="folder" Label="Složka firmy v Dokumentech" Hint="NaPohodu ji nenašla – vyberte ji" @bind-Value="_manualFolder" />
+}
 <div class="toolbar">
-    <button disabled="@(Busy is not null || Unit is null)" @onclick="PlanAsync">Porovnat</button>
+    <button disabled="@(Busy is not null || Unit is null)" @onclick="PlanAsync">Porovnat složky s Pohodou</button>
 </div>
 
 <StatusPanel Busy="@Busy" Error="@Error" />
@@ -79,6 +82,7 @@
 
 @code {
     private string _manualFolder = string.Empty;
+    private bool _folderUnresolved;
     private string? _companyFolder;
     private DocDirsPlan? _plan;
     private IReadOnlyList<string> _duplicates = [];
@@ -105,9 +109,10 @@
         {
             var invoices = await Session.GetInvoicesAsync(unit);
             var folder = PohodaSession.ResolveCompanyFolder(unit, invoices.Value, Options.DocumentsPath, _manualFolder);
+            _folderUnresolved = folder.Path is null;
             if (folder.Path is not { } companyFolder)
             {
-                throw new PohodaException($"Složku firmy nelze určit ({folder.Source}). Zadejte ji ručně.");
+                throw new PohodaException($"Složku firmy v Dokumentech se nepodařilo zjistit ({folder.Source}). Vyberte ji výše a porovnejte znovu.");
             }
 
             var mdbPath = PohodaDataFile.PathFor(Options.DataPath, unit.DataFile);

@@ -67,7 +67,11 @@ tr.clickable:hover td { background: var(--accent-bg); }
 .tile.soon { background: var(--bg-muted); color: var(--text-muted); pointer-events: none; }
 .tile strong { font-size: 1rem; }
 
-.alert { padding: .75rem 1rem; border-radius: 8px; margin: .75rem 0; border: 1px solid; white-space: pre-line; }
+.alert { padding: .75rem 1rem; border-radius: 8px; margin: .75rem 0; border: 1px solid; }
+/* Víceřádkový text zpráv (\n v chybách); u běžného obsahu by pre-line ukázal zalomení ze zdrojáku stránky. */
+.pre-line { white-space: pre-line; }
+.file-list { margin: .25rem 0 .75rem; padding-left: 1.25rem; }
+.file-list li { margin: .1rem 0; }
 .alert.error { background: var(--error-bg); border-color: #fecaca; color: var(--error); }
 .alert.warn { background: var(--warn-bg); border-color: #fde68a; color: var(--warn); }
 .alert.ok { background: var(--ok-bg); border-color: #bbf7d0; color: var(--ok); }

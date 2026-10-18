@@ -2,7 +2,7 @@
 @inject IServiceProvider Services
 
 <div class="form-row">
-    <label for="@Id">@Label @if (Hint is not null) {<span class="muted">(@Hint)</span>}</label>
+    <label for="@Id">@Label@if (Hint is not null) {<span class="muted">&nbsp;(@Hint)</span>}</label>
     <div class="input-with-button">
         <input id="@Id" type="text" placeholder="@Placeholder" value="@Value" @onchange="OnChangedAsync" />
         @if (_picker is not null)

@@ -11,9 +11,13 @@
 </p>
 
 <FolderInput Id="source" Label="Složka se soubory faktur" Placeholder="např. C:\Users\…\Downloads\faktury" @bind-Value="_source" />
-<FolderInput Id="folder" Label="Složka firmy v Dokumentech" Hint="nepovinné – jinak se zjistí z Pohody" @bind-Value="_manualFolder" />
+@* Složka firmy se zjišťuje sama; ruční výběr jen když to nejde (firma zatím bez složky v Dokumentech). *@
+@if (_plan is { CompanyFolder.IsResolved: false } || !string.IsNullOrWhiteSpace(_manualFolder))
+{
+    <FolderInput Id="folder" Label="Složka firmy v Dokumentech" Hint="NaPohodu ji nenašla – vyberte ji" @bind-Value="_manualFolder" />
+}
 <div class="toolbar">
-    <button disabled="@(Busy is not null || Unit is null || string.IsNullOrWhiteSpace(_source))" @onclick="PlanAsync">Načíst plán</button>
+    <button disabled="@(Busy is not null || Unit is null || string.IsNullOrWhiteSpace(_source))" @onclick="PlanAsync">Najít soubory k zatřídění</button>
 </div>
 
 <StatusPanel Busy="@Busy" Error="@Error" />
@@ -28,7 +32,7 @@
         }
         @if (!_plan.CompanyFolder.IsResolved)
         {
-            <br />@("Zadejte složku firmy ručně a načtěte plán znovu.")
+            <br />@("Vyberte složku firmy výše a znovu klikněte na Najít soubory k zatřídění.")
         }
     </div>
 
@@ -64,11 +68,17 @@
     <p>
         Spárováno @_plan.Items.Count: připraveno @_plan.Count(FilingStatus.Ready), už zatříděno @_plan.Count(FilingStatus.AlreadyFiled),
         kolize @_plan.Count(FilingStatus.Conflict), nelze určit @_plan.Count(FilingStatus.Unresolved).
-        @if (_plan.Unmatched.Count > 0)
-        {
-            <br /><span class="muted">Nespárováno @_plan.Unmatched.Count (název neodpovídá faktuře ročníku): @string.Join(", ", _plan.Unmatched)</span>
-        }
     </p>
+    @if (_plan.Unmatched.Count > 0)
+    {
+        <p class="muted">Nespárováno @_plan.Unmatched.Count (název neodpovídá faktuře ročníku):</p>
+        <ul class="file-list muted">
+            @foreach (var file in _plan.Unmatched)
+            {
+                <li>@file</li>
+            }
+        </ul>
+    }
 
     @if (_results is null)
     {
@@ -96,7 +106,7 @@
 
 @if (_markMessage is not null)
 {
-    <div class="alert @_markClass">@_markMessage</div>
+    <div class="alert @_markClass pre-line">@_markMessage</div>
 }
 
 @code {

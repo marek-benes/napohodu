@@ -105,7 +105,9 @@ public class WebTests
         var filing = WebUtility.HtmlDecode(await http.GetStringAsync("/z/90000010_2025.mdb/zatrideni", ct));
 
         Assert.Contains("Složka se soubory faktur", filing, StringComparison.Ordinal);
-        Assert.Equal(withPicker ? 2 : 0, filing.Split("Vybrat…").Length - 1);
+        // Složka firmy se nenabízí, dokud ji NaPohodu sama nenajde – jen zdrojová složka má „Vybrat…“.
+        Assert.DoesNotContain("Složka firmy v Dokumentech", filing, StringComparison.Ordinal);
+        Assert.Equal(withPicker ? 1 : 0, filing.Split("Vybrat…").Length - 1);
         await app.StopAsync(ct);
     }
 
