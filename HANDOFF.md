@@ -24,12 +24,13 @@ Předání kontextu mezi sessions. Při pokračování začni tímto souborem (h
 | Instalace | Jeden počítač (tento), jeden účet Windows, jedna kopie. Spouštění zástupcem na ploše. Produkce oddělená od vývoje (`tools/install.ps1`, viz CLAUDE.md „Provoz“). Rozhodnuto 2026-10-18. |
 | Ovládání pro účetní | Spuštění i ukončení jako běžná aplikace: zástupce → okno (Edge `--app`), křížek → po 15 min nečinnosti se server vypne; ikona u hodin pro kontrolu a „Ukončit“. Výběr složek systémovým dialogem. Ikona u hodin ověřena uživatelem 2026-10-18. Zavírání okna skriptem při „Ukončit“ v Edge `--app` nefunguje (zkoušeno a vráceno); po ukončení serveru okno ukáže českou hlášku o ztrátě spojení s odkazem na zástupce. Bez přepisu UI (zůstává Blazor, ověřitelný v prohlížeči). Zvažováno a zamítnuto: přímé MDB místo XML (nedokumentované schéma, importy jen přes XML), WPF (přepis UI), Blazor Hybrid (nový hostitel, nejde ověřovat v prohlížeči), Windows služba (Pohoda.exe v session 0). Rozhodnuto 2026-10-18. |
 | mServer | Nepoužívat (instance na jednotku, blokuje zálohy). |
+| Podklady a inbox | Sdílený disk `Podklady\<Firma>` (název = složka firmy v Dokumentech). `Ke zpracování` je jen inbox zákazníka; cesty skládá aplikace podle zákazníka, nic se nepřejmenovává. Stav souborů v evidenci aplikace (otisk SHA-256), ne v podsložkách; výsledky zpracováno / vráceno (`Ke zpracování\Vráceno` + důvod) / ručně (interní archiv) / odloženo. Moduly zpracování: přiřazení k faktuře, ručně, vrácení; později ISDOC, LLM, pokladna. Šanony = exportovaný obraz účetnictví pro zákazníky (`<RRRR>\<období>\<agenda>`), složky zakládá aplikace, ruční tisky z Pohody jen do připravených složek, export nemaže cizí soubory. Automatizujeme nejdřív přijaté faktury. Podrobně `docs/podklady.md`. Rozhodnuto 2026-10-18. |
 
 ## Plán rozšíření (od uživatele)
 
 1. Automatizace spouštěné z CLI (Task Scheduler).
 2. Automatický sběr faktur z e-mailu / adresáře, analýza AI, export do Pohody včetně souboru v Dokumentech firmy.
-3. Automatický import přejmenovaných souborů s fakturami.
+3. Automatický import přejmenovaných souborů s fakturami. *(Nahrazeno zpracováním inboxu bez přejmenování, viz plán E.)*
 4. Reporty pro zákazníky.
 5. Webový klient; později možný inbox pro výměnu souborů mezi klienty a účetní.
 
@@ -70,7 +71,9 @@ Mapování modulů `napohodu-electron/src` → nová generace:
 - ~~Má být Pohoda při zatřiďování zavřená?~~ Přesun funguje vždy; poznačení DocDirs jen při zavřené jednotce, jinak UI/CLI poradí dokončit později.
 - ~~Kolik stanic, distribuce?~~ **Jeden PC, jeden účet**, instalace skriptem.
 - Mají se zatřiďovat i přijaté dobropisy a zálohové faktury (jiný `RelTpFak`, jiný `invoiceType`)? **Otevřené.**
-- Co má obsahovat „Export pro zákazníka“? **Otevřené.**
+- ~~Co má obsahovat „Export pro zákazníka“?~~ **Šanony** (`docs/podklady.md`): faktury, banka, pokladna, podání s doručenkami, mzdy; podání jako PDF.
+- Lze zjistit periodicitu DPH zákazníka z Pohody, nebo bude jen nastavením v aplikaci? **Neověřeno.**
+- Jak se jmenují zprávy ISDS s potvrzením o přijetí podání a jde je spárovat s obdobím? **Neověřeno.**
 - Vrací `Pohoda.exe` chybové kódy 1xx/5xx jako návratový kód procesu (špatné heslo, poškozená jednotka)? **Neověřeno** (ověřeno jen odmítnutí balíčku s kódem 0).
 
 ## Navržený první krok
@@ -127,3 +130,15 @@ Až po B.1 (testovací jednotka). Ověřit XML import přijaté faktury se zálo
 - Nejde: importovat fakturu rovnou jako uhrazenou (`inv:liquidation` je „Pouze pro export, při importu je ignorováno“). `liquidationWithoutLink.xsd` = likvidace bez dokladu, `automaticLiquidation.xsd` = jen bankovní doklady.
 - Import faktury a úhrada najednou: jeden `dat:dataPack` se dvěma `dat:dataPackItem` (faktura, pak výdajový doklad odkazující na její číslo). **Ověřit na testovací jednotce**: zpracuje Pohoda položky postupně, aby doklad fakturu našel? Jinak dvě volání (import faktury → ID z odpovědi → pokladní doklad). Dál ověřit jednoznačnost čísla (`numberRequested` / z odpovědi), chování při selhání úhrady (faktura založená, úhrada ne), DPH na položce likvidace a zaúčtování.
 - Postup: připravit ukázkový XML balíček (faktura + výdajový pokladní doklad) a vyzkoušet jen na testovací jednotce (B.1), ne na ostrých datech.
+
+### E. Podklady: inbox a Šanony (návrh `docs/podklady.md`, rozhodnuto 2026-10-18)
+
+Pořadí implementace:
+
+1. **Konfigurace a odvození cest**: `Podklady:RootPath`, inbox zákazníka z názvu složky firmy (stejný resolver jako u Dokumentů); stránka Zatřídění a `napohodu filing` bez ručního zdroje (`--source` jen jako výjimka). Malé, hned použitelné.
+2. **Založení struktury**: `napohodu podklady init [-c] [--year]` (inbox, `Vráceno`, rok, období podle periodicity, `Mzdy\<MM>`), výchozí náhled. Nastavení periodicity DPH u zákazníka.
+3. **Evidence inboxu**: úložiště v `%LOCALAPPDATA%\<instance>` (soubor podle SHA-256, stav, skupina, doklad, kdo/kdy), příjem a rozpoznání druhu souboru, duplicity.
+4. **Stránka „Ke zpracování“** s moduly: přiřazení k faktuře (víc souborů k jednomu dokladu, hlavní `<číslo>` + přílohy `<číslo>_<název>`, i k faktuře, která soubory už má; přesun + DocDirs), ručně (archiv `Dokumenty\<firma>\NaPohodu\Přijato\<RRRR>\<MM>`), vrácení. Soubory pojmenované číslem se párují automaticky jako dnes.
+5. **Export Šanonů**: rozšíření `audit-export` o cílovou strukturu, pak `ELvykazy` a ISDS; kontrola úplnosti ručních tisků.
+6. **Převod stávajících Šanonů** do nové struktury s uživatelem (náhled před přesunem; ruční soubory jako `Podklady Beranová…` a zipy řešit jednotlivě).
+7. Později moduly ISDOC, LLM, pokladna (po B.1, testovací jednotce).

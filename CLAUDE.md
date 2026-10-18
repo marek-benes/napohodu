@@ -14,6 +14,7 @@ Toto je **druhá generace** aplikace. První generace (Electron + TypeScript) je
 
 - **Zákazník** (`zákazník`) = **účetní jednotka** Pohody (`účetní jednotka`) v konkrétním roce: jedna firma, jeden datový soubor MDB. Seznam se čte přes `listAccountingUnitRequest`; identifikátor je název datového souboru (`dataFile`). Není to `odběratel`/obchodní partner na dokladu.
 - **Dokumenty** = složka `<documentsPath>\<složka firmy>\…`, společná pro všechny roky jedné firmy. Pohoda do ní ukládá soubory k dokladům a v MDB drží vazbu doklad → adresář (tabulka `DocDirs`).
+- **Podklady** = sdílený disk `<Podklady:RootPath>\<složka firmy>\` (název stejný jako složka firmy v Dokumentech). **Ke zpracování** = inbox, kam zákazník nahrává cokoliv; stav zpracování vede aplikace ve své evidenci, ne podsložkami. **Šanony** = exportovaný obraz účetnictví pro zákazníky (`<RRRR>\<období>\<agenda>`), složky zakládá aplikace a nikdy nemaže soubory, které nevytvořila. Pravidla: **`docs/podklady.md`**.
 
 ### Prostředí
 
@@ -114,6 +115,7 @@ docs/pohoda/schemas/      oficiální XSD version_2 (windows-1250)
 docs/pohoda/mdb/NOTES.md  zjištění o MDB (DocDirs, RelAgID, RelTpFak, postup zápisu)
 docs/pohoda/mdb/*.ps1     původní PowerShell nástroje (discovery, diff, rekonciliace)
 docs/pohoda/import_faktury_vcetne_zalozky_dokumenty.xml  ukázka importu faktury se záložkou Dokumenty
+docs/podklady.md          Podklady: inbox Ke zpracování, Šanony, moduly zpracování (rozhodnuto 2026-10-18)
 HANDOFF.md                stav migrace, rozhodnutí, plán, otevřené otázky
 ```
 
