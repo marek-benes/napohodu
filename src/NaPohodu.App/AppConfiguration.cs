@@ -20,8 +20,20 @@ internal static class AppConfiguration
             .AddEnvironmentVariables("NAPOHODU_")
             .Build();
 
-    public static PohodaOptions GetPohodaOptions(IConfiguration configuration) =>
-        configuration.GetSection(PohodaOptions.SectionName).Get<PohodaOptions>() ?? new PohodaOptions();
+    public static InstanceOptions GetInstanceOptions(IConfiguration configuration) =>
+        configuration.GetSection(InstanceOptions.SectionName).Get<InstanceOptions>() ?? new InstanceOptions();
+
+    /// <summary>Nastavení Pohody; zálohy MDB bez explicitní cesty jdou do datové složky instance.</summary>
+    public static PohodaOptions GetPohodaOptions(IConfiguration configuration)
+    {
+        var options = configuration.GetSection(PohodaOptions.SectionName).Get<PohodaOptions>() ?? new PohodaOptions();
+        if (string.IsNullOrWhiteSpace(options.BackupPath))
+        {
+            options.BackupPath = Path.Combine(GetInstanceOptions(configuration).DataDirectory, "Zalohy");
+        }
+
+        return options;
+    }
 
     /// <summary>Chyby konfigurace pro volání Pohody, česky; prázdný seznam = v pořádku.</summary>
     public static IReadOnlyList<string> Validate(PohodaOptions options)

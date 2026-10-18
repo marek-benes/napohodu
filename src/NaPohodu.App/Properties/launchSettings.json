@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "napohodu (vývoj)": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "NAPOHODU_Instance__Name": "NaPohodu-vyvoj",
+        "NAPOHODU_Instance__Port": "5081"
+      }
+    }
+  }
+}

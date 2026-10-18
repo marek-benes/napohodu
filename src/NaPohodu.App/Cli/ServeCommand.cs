@@ -12,14 +12,11 @@ namespace NaPohodu.App.Cli;
 /// </summary>
 internal static class ServeCommand
 {
-    public const int DefaultPort = 5080;
-
     public static Command Create(CliServices services)
     {
-        var portOption = new Option<int>("--port", "-p")
+        var portOption = new Option<int?>("--port", "-p")
         {
-            Description = "Port na 127.0.0.1.",
-            DefaultValueFactory = _ => DefaultPort,
+            Description = "Port na 127.0.0.1 (výchozí z konfigurace Instance:Port, produkce 5080).",
         };
         var noBrowserOption = new Option<bool>("--no-browser")
         {
@@ -34,36 +31,84 @@ internal static class ServeCommand
 
         command.SetAction(async (parseResult, cancellationToken) =>
         {
+            var output = parseResult.InvocationConfiguration.Output;
+            var error = parseResult.InvocationConfiguration.Error;
+            var instance = AppConfiguration.GetInstanceOptions(services.Configuration);
+            if (parseResult.GetValue(portOption) is { } port)
+            {
+                instance.Port = port;
+            }
+
+            var openBrowser = !parseResult.GetValue(noBrowserOption);
+
+            // Jen jedna kopie: druhé spuštění (opakovaný klik na zástupce) jen otevře prohlížeč na běžící instanci.
+            using var singleInstance = new Mutex(initiallyOwned: true, $@"Local\{instance.Name}-serve", out var isFirst);
+            if (!isFirst)
+            {
+                await output.WriteLineAsync($"{instance.Name} už běží na {instance.Url}{(openBrowser ? ", otevírám prohlížeč" : "")}.").ConfigureAwait(false);
+                if (openBrowser)
+                {
+                    OpenBrowser(instance.Url);
+                }
+
+                return PohodaCommandRunner.Ok;
+            }
+
             var options = AppConfiguration.GetPohodaOptions(services.Configuration);
             var errors = AppConfiguration.Validate(options);
             if (errors.Count > 0)
             {
                 foreach (var message in errors)
                 {
-                    await parseResult.InvocationConfiguration.Error.WriteLineAsync(message).ConfigureAwait(false);
+                    await error.WriteLineAsync(message).ConfigureAwait(false);
                 }
 
+                await error.WriteLineAsync($"Nastavení doplňte do {Path.Combine(AppContext.BaseDirectory, AppConfiguration.LocalFileName)}.").ConfigureAwait(false);
                 return PohodaCommandRunner.ConfigurationError;
             }
 
-            var url = $"http://127.0.0.1:{parseResult.GetValue(portOption)}";
-            var app = Build(services, options, url);
-            await app.StartAsync(cancellationToken).ConfigureAwait(false);
-            await parseResult.InvocationConfiguration.Output.WriteLineAsync($"NaPohodu běží na {url} (ukončíte Ctrl+C).").ConfigureAwait(false);
-            if (!parseResult.GetValue(noBrowserOption))
+            var app = Build(services, options, instance);
+            try
             {
-                OpenBrowser(url);
+                await app.StartAsync(cancellationToken).ConfigureAwait(false);
+            }
+            catch (IOException ex)
+            {
+                await error.WriteLineAsync($"Port {instance.Port} je obsazený jiným programem ({ex.Message}). Nastavte jiný v Instance:Port.").ConfigureAwait(false);
+                await app.DisposeAsync().ConfigureAwait(false);
+                return PohodaCommandRunner.ConfigurationError;
+            }
+
+            SetConsoleTitle($"{instance.Name}{(instance.IsProduction ? "" : " (VÝVOJ)")} – zavřením okna se aplikace ukončí");
+            await output.WriteLineAsync($"{instance.Name} běží na {instance.Url}. Zavřením tohoto okna (nebo Ctrl+C) se ukončí.").ConfigureAwait(false);
+            if (openBrowser)
+            {
+                OpenBrowser(instance.Url);
             }
 
             await app.WaitForShutdownAsync(cancellationToken).ConfigureAwait(false);
+            await app.DisposeAsync().ConfigureAwait(false);
             return PohodaCommandRunner.Ok;
         });
 
         return command;
     }
 
-    internal static WebApplication Build(CliServices services, PohodaOptions options, string url)
+    private static void SetConsoleTitle(string title)
     {
+        try
+        {
+            Console.Title = title;
+        }
+        catch (IOException)
+        {
+            // Bez konzole (přesměrovaný výstup) titulek nejde nastavit.
+        }
+    }
+
+    internal static WebApplication Build(CliServices services, PohodaOptions options, InstanceOptions instance)
+    {
+        var url = instance.Url;
         var builder = WebApplication.CreateBuilder(new WebApplicationOptions
         {
             // Podle názvu aplikace se hledá manifest statických souborů (napohodu.staticwebassets.*.json).
@@ -83,6 +128,7 @@ internal static class ServeCommand
 
         builder.Services.AddRazorComponents().AddInteractiveServerComponents();
         builder.Services.AddSingleton(options);
+        builder.Services.AddSingleton(instance);
         builder.Services.AddSingleton(TimeProvider.System);
         builder.Services.AddSingleton(sp => services.RunnerFactory(options, sp.GetRequiredService<ILoggerFactory>()));
         builder.Services.AddSingleton<PohodaClient>();

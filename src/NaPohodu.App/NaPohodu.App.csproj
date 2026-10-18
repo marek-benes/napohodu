@@ -20,4 +20,10 @@
     <InternalsVisibleTo Include="NaPohodu.Tests" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Lokální (vývojová) konfigurace s heslem: pro dotnet run vedle exe ano, do publikace nikdy –
+         produkční instalace má vlastní appsettings.Local.json, který se při aktualizaci nepřepisuje. -->
+    <Content Update="appsettings.Local.json" CopyToPublishDirectory="Never" />
+  </ItemGroup>
+
 </Project>

@@ -1,12 +1,17 @@
 @inherits LayoutComponentBase
 @implements IDisposable
 @inject NavigationManager Navigation
+@inject InstanceOptions Instance
 
 <div class="shell">
     <aside class="sidebar">
         <div class="brand">
             <a href="">NaPohodu</a>
             <small>doplněk k POHODĚ</small>
+            @if (!Instance.IsProduction)
+            {
+                <span class="badge warn" title="@($"{Instance.Name}, data v {Instance.DataDirectory}")">VÝVOJ</span>
+            }
         </div>
         <nav>
             <NavLink href="" Match="NavLinkMatch.All">Zákazník</NavLink>

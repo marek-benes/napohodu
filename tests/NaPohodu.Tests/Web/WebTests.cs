@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NaPohodu.App;
 using NaPohodu.App.Cli;
 using NaPohodu.App.Web;
 using NaPohodu.Core.Configuration;
@@ -52,7 +53,7 @@ public class WebTests
             Configuration = new ConfigurationBuilder().Build(),
             RunnerFactory = (_, _) => new CountingRunner(),
         };
-        await using var app = ServeCommand.Build(services, new PohodaOptions(), "http://127.0.0.1:0");
+        await using var app = ServeCommand.Build(services, new PohodaOptions(), new InstanceOptions { Port = 0 });
         await app.StartAsync(ct);
         var address = app.Services.GetRequiredService<IServer>().Features.Get<IServerAddressesFeature>()!.Addresses.Single();
         using var http = new HttpClient { BaseAddress = new Uri(address) };

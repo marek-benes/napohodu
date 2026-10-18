@@ -20,6 +20,7 @@ Předání kontextu z analýzy první generace (Electron) do nového repozitář
 | Hostovaná část / inbox | Zatím mimo rozsah, možná samostatná aplikace. |
 | AI analýza faktur | Později. |
 | Provoz | PC účetní trvale zapnuté. Plánované úlohy smí propadnout, vše musí jít spustit ručně z CLI. |
+| Instalace | Jeden počítač (tento), jeden účet Windows, jedna kopie. Spouštění zástupcem na ploše. Produkce oddělená od vývoje (`tools/install.ps1`, viz CLAUDE.md „Provoz“). Rozhodnuto 2026-10-18. |
 | mServer | Nepoužívat (instance na jednotku, blokuje zálohy). |
 
 ## Plán rozšíření (od uživatele)

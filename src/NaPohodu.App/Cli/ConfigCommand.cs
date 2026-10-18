@@ -14,6 +14,9 @@ internal static class ConfigCommand
         {
             var output = parseResult.InvocationConfiguration.Output;
             var options = AppConfiguration.GetPohodaOptions(services.Configuration);
+            var instance = AppConfiguration.GetInstanceOptions(services.Configuration);
+            await output.WriteLineAsync($"Instance:            {instance.Name}{(instance.IsProduction ? " (produkce)" : " (VÝVOJ)")}, {instance.Url}").ConfigureAwait(false);
+            await output.WriteLineAsync($"Program:             {AppContext.BaseDirectory}").ConfigureAwait(false);
             await output.WriteAsync(Format(options)).ConfigureAwait(false);
 
             var errors = AppConfiguration.Validate(options);
