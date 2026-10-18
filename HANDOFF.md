@@ -1,19 +1,20 @@
-# HANDOFF — stav k 2026-10-15
+# HANDOFF — stav k 2026-10-18
 
-Předání kontextu z analýzy první generace (Electron) do nového repozitáře. Při pokračování na jiném stroji začni tímto souborem a `CLAUDE.md`.
+Předání kontextu mezi sessions. Při pokračování začni tímto souborem (hlavně **Plán další session** na konci) a `CLAUDE.md`.
 
 ## Kde jsme
 
-- Repozitář `napohodu-electron` = první generace (Electron 42, React, TypeScript, PowerShell most do MDB). Funguje v provozu, zůstává bez větších zásahů do dokončení migrace.
-- Tento repozitář = druhá generace v .NET. Zatím obsahuje jen dokumentaci (`docs/pohoda/`), `CLAUDE.md` a tento soubor. Žádný kód.
-- Vývoj se přesouvá na Windows s nainstalovanou Pohodou (lze testovat reálně).
+- Repozitář `napohodu-electron` = první generace (Electron). Zatím nearchivovat, dokud 2. generace neprojde ostrým provozem.
+- Tento repozitář = druhá generace v .NET 10, **funkčně nahrazuje 1. generaci** (bez „Export pro zákazníka“, který byl i tam jen placeholder): seznam jednotek a faktur z Pohody, zatřídění souborů, poznačení DocDirs, export pro kontrolu; CLI + webové UI + okenní spouštěč s ikonou u hodin. 163 testů nad anonymizovanými reálnými daty.
+- **Produkce nainstalovaná** na tomto PC (`%LOCALAPPDATA%\Programs\NaPohodu`, zástupce „NaPohodu“ na ploše, aktualizace `C:\Tools\NAPOHODU-UPDATE.bat`). Vývoj běží odděleně (instance `NaPohodu-vyvoj`, port 5081).
+- **Pozor:** vývoj i produkce sahají na **stejnou Pohodu, stejná data a Dokumenty**. Zápisové operace (přesun, DocDirs, budoucí import) z vývoje míří do ostrých dat.
 
 ## Rozhodnutí (schválená uživatelem)
 
 | Téma | Rozhodnutí |
 |---|---|
-| Stack | .NET (C#) pro vše: Core + CLI + Blazor web v jednom exe s podpříkazy. Ne WinForms, ne Electron, ne Node. |
-| Architektura | `src/NaPohodu.Core`, `src/NaPohodu.App`, `tests/NaPohodu.Tests`. Co nejméně částí, jeden jazyk. |
+| Stack | .NET (C#) pro vše: Core + CLI + Blazor web. Obrazovky ne ve WinForms; WinForms jen izolovaně v `NaPohodu.Desktop` pro ikonu u hodin a dialog výběru složky. Ne Electron, ne Node. |
+| Architektura | `src/NaPohodu.Core` (logika), `src/NaPohodu.App` (`napohodu.exe`: CLI + Blazor), `src/NaPohodu.Desktop` (`NaPohodu.Desktop.exe`: okenní spouštěč), `tests/NaPohodu.Tests`. |
 | Build | `win-x86` kvůli Jet OLEDB (dáno Pohodou). |
 | Edice Pohody | POHODA Komplet (MDB). Jet most je správná cesta k zápisu `DocDirs`. |
 | Kód | Nový repozitář (tento), ne větev. Electron verze archivovat po migraci. |
@@ -63,13 +64,14 @@ Mapování modulů `napohodu-electron/src` → nová generace:
 
 ## Otevřené otázky (ověřit na Windows nebo s uživatelem)
 
-- ~~Vrací export s `attachments=true` `companyDocumentsFolder` u každé faktury, nebo jen u faktur s dokumenty?~~ **Ověřeno 2026-10-15: jen u faktur s dokumenty** (SafetyLine 2025: 36 z 484). Firma bez jediného zatříděného souboru složku z exportu nedostane → **otevřené: odkud ji vzít** (heuristika z názvu + ověření existence, ruční nastavení per zákazník, nebo jiný ročník téže firmy).
-- Proč mají přijaté faktury prefixovou úroveň a vydané plochou? **Částečně:** u přijatých jsou v jedné jednotce obě podoby (`Fakturace\Přijaté faktury\2511\251100002` i plochá `Fakturace\Přijaté faktury\251100001`), takže tvar určuje to, kdo/jak soubor zatřídil, ne pevné pravidlo. Prostřední úroveň odpovídá `number/ids` (`2511`). Zbývá: jaký tvar má NaPohodu vytvářet pro nové zatřídění (návrh: `<ids>\<číslo>`, jak to dělá většina).
-- Mají se zatřiďovat i přijaté dobropisy a zálohové faktury (jiný `RelTpFak`, jiný `invoiceType`)?
-- Má zatřídění hledat faktury ve všech ročnících firmy, nebo jen ve vybraném?
-- Má účetní při zatřiďování Pohodu zavřenou? Automatické poznačení po přesunu to vyžaduje.
-- Co má obsahovat „Export pro zákazníka“ (v 1. generaci jen placeholder)?
-- Kolik uživatelů a stanic, jak se distribuuje exe.
+- ~~Vrací export `companyDocumentsFolder` u každé faktury?~~ **Jen u faktur s dokumenty.** Vyřešeno: export → složka podle názvu firmy (ověřeno na 20 firmách) → ruční zadání / „Vybrat…“.
+- ~~Jaký tvar podsložky vytvářet?~~ **Rozhodnuto: s prefixem řady** `<ids>\<číslo>`; existující tvar z Pohody se převezme.
+- ~~Hledat faktury ve všech ročnících?~~ **Rozhodnuto: jen vybraný ročník.**
+- ~~Má být Pohoda při zatřiďování zavřená?~~ Přesun funguje vždy; poznačení DocDirs jen při zavřené jednotce, jinak UI/CLI poradí dokončit později.
+- ~~Kolik stanic, distribuce?~~ **Jeden PC, jeden účet**, instalace skriptem.
+- Mají se zatřiďovat i přijaté dobropisy a zálohové faktury (jiný `RelTpFak`, jiný `invoiceType`)? **Otevřené.**
+- Co má obsahovat „Export pro zákazníka“? **Otevřené.**
+- Vrací `Pohoda.exe` chybové kódy 1xx/5xx jako návratový kód procesu (špatné heslo, poškozená jednotka)? **Neověřeno** (ověřeno jen odmítnutí balíčku s kódem 0).
 
 ## Navržený první krok
 
@@ -91,8 +93,32 @@ Mapování modulů `napohodu-electron/src` → nová generace:
    - **Blazor `serve` hotovo 2026-10-15**: stránky Výběr zákazníka, rozcestník, Přijaté faktury, Zatřídění (plán, kolize po souborech, přesun + automatické poznačení DocDirs jako v 1. generaci), Poznačení v Pohodě, Export pro kontrolu (výchozí období = minulý měsíc). Ověřeno v prohlížeči proti reálné Pohodě jen v režimu čtení (SafetyLine 2025: faktury, plán zatřídění, porovnání DocDirs, náhled exportu); přesun ani zápis z UI zatím neproběhl. Ověřeno i z publikované verze (statické soubory z `wwwroot`).
    - „Export pro zákazníka“ je v UI jako „Připravujeme“ (otevřená otázka, co má obsahovat).
 
-## Další možné kroky
+5. **Provoz a ovládání hotovo 2026-10-18**: produkční instalace (`tools/install.ps1`, `C:\Tools\NAPOHODU-UPDATE.bat`), oddělení vývoje, okenní spouštěč `NaPohodu.Desktop` (okno Edge `--app`, ikona u hodin – ověřeno uživatelem, vypnutí po 15 min nečinnosti, obnova dat starších než 4 h), výběr složek dialogem, ikona aplikace z 1. generace, výchozí filtr roku, fokus na vyhledávání, česká hláška o ztrátě spojení.
 
-- Plán rozšíření 1: plánované úlohy (Task Scheduler) nad CLI – co přesně automatizovat.
-- Otevřené otázky výše (dobropisy a zálohové faktury, distribuce exe, více stanic).
-- První ostrý zápis DocDirs ověřit v Pohodě; smazat duplicitní složku `SafetyLine\…\2511\251100001` (totožná kopie, Pohoda odkazuje na plochou) a zálohu 1. generace v datové složce.
+## Plán další session
+
+### A. Ověřit v ostrém provozu (bez nového kódu, s uživatelem)
+
+Nic z toho zatím neproběhlo na ostrých datech – je to největší riziko.
+
+1. **První ostrý zápis DocDirs**: v UI (zástupce) zatřídit jednu fakturu s poznačením při **zavřené** jednotce v Pohodě → v Pohodě zkontrolovat záložku Dokumenty u faktury. Zálohu najdeš v `%LOCALAPPDATA%\NaPohodu\Zalohy`. Výsledek zapsat sem a do `docs/pohoda/mdb/NOTES.md` (INSERT přes AutoNumber Pohoda v praxi ještě „neviděla“).
+2. **Dialog „Vybrat…“**: otevírá se nad oknem aplikace a doplní cestu?
+3. **Vypnutí po nečinnosti**: zavřít okno → do 15 min zmizí ikona u hodin.
+4. **Export pro kontrolu** ostře (kopírování do složky, zatím jen náhled).
+5. Chování při otevřené jednotce v Pohodě (poznačení odmítne, poradí dokončit) a při jiné firmě než SafetyLine (hlavně firmy bez složky v Dokumentech).
+6. Úklid (ručně uživatel): duplicitní složka `SafetyLine\Fakturace\Přijaté faktury\2511\251100001` (totožná kopie, Pohoda odkazuje na plochou) a záloha 1. generace `Data\08215839_2025.backup-20260727163103..mdb`.
+
+### B. Technický dluh (malé, doporučeno před rozšířeními)
+
+1. **Testovací účetní jednotka v Pohodě pro vývoj** (založí uživatel) – aby vývoj nezapisoval do ostrých dat; vývojová instance pak může mít povolený zápis jen do ní. Podmínka pro plán rozšíření 2/3 (import faktur).
+2. **Log do souboru** pro `NaPohodu.Desktop` (bez konzole teď chyby nejsou nikde vidět): `%LOCALAPPDATA%\<instance>\Logy`, rotace, bez obsahu odpovědí Pohody a bez osobních údajů (chyba č. 3 z 1. generace).
+3. Sjednotit x86 runtime: `Microsoft.WindowsDesktop.App` x86 je 10.0.10, ostatní 10.0.13 (`winget install Microsoft.DotNet.DesktopRuntime.10 --architecture x86`).
+4. Ověřit chybové stavy Pohody (špatné heslo, modální dialog → timeout 2 min) a srozumitelnost hlášek v UI.
+
+### C. Plán rozšíření 1: plánované úlohy (Task Scheduler)
+
+Nejdřív s uživatelem rozhodnout **co a kdy** automatizovat (CLI je připravené). Kandidáti: noční `napohodu docdirs -c … --apply` pro aktuální ročníky (poznačení souborů zatříděných ručně), pravidelný `audit-export` na konci měsíce, kontrola konfigurace/dostupnosti Pohody. Pak: skript pro registraci úloh (`tools/schedule.ps1`), běh při zapnutém PC bez nutnosti přihlášení řešit opatrně (Pohoda.exe potřebuje uživatelskou relaci), výsledky do logu.
+
+### D. Plán rozšíření 2/3: sběr a import faktur
+
+Až po B.1 (testovací jednotka). Ověřit XML import přijaté faktury se záložkou Dokumenty (`docs/pohoda/import_faktury_vcetne_zalozky_dokumenty.xml`) na testovací jednotce, pak sběr z adresáře (přejmenované soubory), e-mail (MailKit) a AI analýza (později). Otevřená otázka dobropisů/zálohových faktur se tím stane aktuální.
