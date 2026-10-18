@@ -136,7 +136,7 @@ Až po B.1 (testovací jednotka). Ověřit XML import přijaté faktury se zálo
 Pořadí implementace:
 
 1. **Konfigurace a odvození cest**: `Podklady:RootPath`, inbox zákazníka z názvu složky firmy (stejný resolver jako u Dokumentů); stránka Zatřídění a `napohodu filing` bez ručního zdroje (`--source` jen jako výjimka). Malé, hned použitelné.
-2. **Založení struktury**: `napohodu podklady init [-c] [--year]` (inbox, `Vráceno`, rok, období podle periodicity, `Mzdy\<MM>`), výchozí náhled. Nastavení periodicity DPH u zákazníka.
+2. **Založení struktury a převod na místě**: `napohodu podklady init [-c] [--year]`, výchozí náhled: stávající `Šanony` → `Archiv` (jen přejmenování, sdílení zůstává), nová kostra Šanonů (rok, období podle periodicity, `Mzdy\<MM>`), doplnění chybějícího inboxu a `Vráceno` (u nového inboxu upozornit, že zápis pro zákazníka nasdílí účetní ručně). Po jednotlivých zákaznících. Nastavení periodicity DPH u zákazníka. Nový sdílený disk zamítnut (zákazníci mají sdílené složky, ne disk). Viz `docs/podklady.md`, „Přístup zákazníků a přechod“.
 3. **Evidence inboxu**: úložiště v `%LOCALAPPDATA%\<instance>` (soubor podle SHA-256, stav, skupina, doklad, kdo/kdy), příjem a rozpoznání druhu souboru, duplicity.
 4. **Stránka „Ke zpracování“** s moduly: přiřazení k faktuře (víc souborů k jednomu dokladu, hlavní `<číslo>` + přílohy `<číslo>_<název>`, i k faktuře, která soubory už má; přesun + DocDirs), ručně (archiv `Dokumenty\<firma>\NaPohodu\Přijato\<RRRR>\<MM>`), vrácení. Soubory pojmenované číslem se párují automaticky jako dnes.
 5. **Export Šanonů**: rozšíření `audit-export` o cílovou strukturu, pak `ELvykazy` a ISDS; kontrola úplnosti ručních tisků.

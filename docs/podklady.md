@@ -107,6 +107,29 @@ Moduly zpracování (každý nový = nový modul, struktura se nemění):
 
 - Přechod: soubor, který se už jmenuje číslem dokladu (nebo `<číslo>_<popis>`), se spáruje automaticky jako dnes.
 
+## Přístup zákazníků a přechod
+
+Zákazníci nejsou členy sdíleného disku. Většinou mají nasdílené **čtení celé složky** `Podklady\<Firma>` a **zápis do `Ke zpracování`** (uživatel 2026-10-18). Z toho plyne:
+
+- **Nový disk ne.** Sdílení drží složky (ID); přejmenování a přesun v rámci disku je zachová, nový disk by znamenal nasdílet vše znovu a rozbít zákazníkům odkazy a zástupce. Název disku zákazníci nevidí; jeho přejmenování mění jen `Podklady:RootPath`.
+- **Převod na místě, po jednotlivých zákaznících:**
+
+  | Složka | Akce |
+  |---|---|
+  | `Ke zpracování` | beze změny (ID i sdílení pro zápis zůstávají) |
+  | `Šanony` (stávající) | přejmenovat na `Archiv`; aplikace do něj nikdy nepíše |
+  | `Šanony` (nová) | založí aplikace; dědí čtení ze složky zákazníka |
+  | chybějící `Ke zpracování` | založí aplikace; **zápis pro zákazníka musí nasdílet účetní ručně** (aplikace práva na Google Drive nevidí ani nemění) |
+
+- Zákazník je převedený, když existuje `Archiv` nebo nová kostra Šanonů; dokud ne, aplikace do jeho Šanonů nepíše.
+- `Archiv` zůstává jako „starší podklady“; přesun do nové struktury je volitelný a vždy s náhledem.
+- Sdělení zákazníkovi: „Nahrávejte dál do Ke zpracování. Šanony mají nové uspořádání, starší podklady najdete ve složce Archiv.“
+
+Důsledky pro inbox:
+
+- `Vráceno` uvnitř `Ke zpracování` dědí zápis, zákazník si z něj soubory může vzít nebo je smazat (žádoucí). Může do něj ale omylem i nahrávat: příjem `Vráceno` vždy přeskočí a soubory, které v něm nejsou evidované jako vrácené, jen nahlásí.
+- Podsložky, které si zákazník v inboxu založí sám, se procházejí rekurzivně (kromě `Vráceno`).
+
 ### Mimo rozsah
 
 - Originály, které nejsou přijatou fakturou (výpisy, pokladna, mzdové podklady, smlouvy), ukládá účetní do Dokumentů ručně; aplikace je jen přesune do interního archivu (výsledek „ručně“). Automatizujeme nejdřív přijaté faktury.
