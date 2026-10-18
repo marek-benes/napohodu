@@ -272,6 +272,41 @@ public sealed class CliTests : IDisposable
     }
 
     [Fact]
+    public async Task PodkladyInit_PreviewThenApply()
+    {
+        using var temp = new Filing.TempDirectory();
+        var company = temp.Dir("Dokumenty", "Firma");
+        var settings = Settings();
+        settings["Podklady:RootPath"] = temp.Dir("Podklady");
+        string[] args = ["podklady", "init", "-c", RealFixtures.UnitDataFile2025, "--company-folder", company, "--period", "ctvrtletne"];
+
+        var preview = await Run(settings, args);
+
+        Assert.Equal(PohodaCommandRunner.Ok, preview);
+        Assert.False(Directory.Exists(Path.Combine(temp.Path, "Podklady", "Firma")));
+        var text = _output.ToString();
+        Assert.Contains("Periodicita:  čtvrtletně (zadáno)", text, StringComparison.Ordinal);
+        Assert.Contains(@"Založit:      Šanony\2025", text, StringComparison.Ordinal);
+        Assert.Contains("… a 40 podsložek roku (období Q1–Q4 s agendami, Mzdy, Závěrka, Dokumenty)", text, StringComparison.Ordinal);
+        Assert.Contains("nasdílejte ji zákazníkovi pro zápis", text, StringComparison.Ordinal);
+        Assert.Contains("Náhled – nic se nezměnilo.", text, StringComparison.Ordinal);
+
+        var apply = await Run(settings, [.. args, "--apply"]);
+
+        Assert.Equal(PohodaCommandRunner.Ok, apply);
+        Assert.True(Directory.Exists(Path.Combine(temp.Path, "Podklady", "Firma", "Šanony", "2025", "Q4", "Banka")));
+    }
+
+    [Fact]
+    public async Task PodkladyInit_WithoutRoot_IsConfigurationError()
+    {
+        var exitCode = await Run("podklady", "init", "-c", RealFixtures.UnitDataFile2025);
+
+        Assert.Equal(PohodaCommandRunner.ConfigurationError, exitCode);
+        Assert.False(_runner.WasCalled);
+    }
+
+    [Fact]
     public async Task Filing_MarkDocsWithoutApply_IsRejected()
     {
         using var temp = new Filing.TempDirectory();

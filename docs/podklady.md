@@ -122,6 +122,7 @@ Zákazníci nejsou členy sdíleného disku. Většinou mají nasdílené **čte
   | chybějící `Ke zpracování` | založí aplikace; **zápis pro zákazníka musí nasdílet účetní ručně** (aplikace práva na Google Drive nevidí ani nemění) |
 
 - Zákazník je převedený, když existuje `Archiv` nebo nová kostra Šanonů; dokud ne, aplikace do jeho Šanonů nepíše.
+- Provádí `napohodu podklady init -c <ročník> [--period mesicne|ctvrtletne]` (náhled, pak `--apply`): Šanony s čímkoliv mimo strukturu → `Archiv` (jen když Archiv ještě není, jinak se cizí položky jen hlásí), kostra roku jednotky, chybějící `Ke zpracování` a `Vráceno`. Periodicita se pozná z názvů období založených roků, jinak je povinná volba.
 - `Archiv` zůstává jako „starší podklady“; přesun do nové struktury je volitelný a vždy s náhledem.
 - Sdělení zákazníkovi: „Nahrávejte dál do Ke zpracování. Šanony mají nové uspořádání, starší podklady najdete ve složce Archiv.“
 
